@@ -219,6 +219,33 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 .databar .dl{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-text);margin-right:12px}
 .databar .dsmsg{grid-column:1/-1;margin:0;font-size:12.5px;color:var(--muted)}
 .databar .dsmsg.bad{color:var(--serious)}
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);max-width:1440px;margin:0 auto}
+.shell>.wrap{margin:0;max-width:1160px}
+.side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:48px 14px 32px 24px;border-right:1px solid var(--line);scrollbar-width:thin}
+.side-brand{display:grid;gap:2px;text-decoration:none;margin-bottom:26px}
+.side-brand .sb-t{font-family:var(--f-display);font-size:22px;font-weight:600;line-height:1.1;color:var(--ink)}
+.side-brand .sb-s{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-text)}
+.sn-sec{margin-bottom:20px}
+.sn-h{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin:0 0 6px 10px}
+.side ul{list-style:none;margin:0;padding:0;display:grid;gap:1px}
+.side a:not(.side-brand){display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:13.5px;color:var(--ink-2);text-decoration:none;padding:5px 10px;border-radius:999px;transition:background .15s,color .15s}
+.side a:not(.side-brand):hover{background:var(--band);color:var(--ink)}
+.side a.on{background:var(--gold-wash);color:var(--ink);font-weight:600}
+.sn-n{font-size:11px;color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+.anchor,.cls{scroll-margin-top:24px}
+.menu-btn{display:none}
+.scrim{position:fixed;inset:0;z-index:29;background:color-mix(in srgb,var(--ink) 30%,transparent)}
+@media (min-width:1240px){#index{display:none}.scrim{display:none}}
+@media (max-width:1239px){
+  .shell{display:block;max-width:none}
+  .shell>.wrap{margin:0 auto}
+  .side{position:fixed;left:0;top:0;bottom:0;z-index:30;width:280px;height:auto;background:var(--surface);box-shadow:var(--shadow);transform:translateX(-102%);transition:transform .25s ease;padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+  .side.open{transform:none}
+  .menu-btn{display:inline-flex;align-items:center;gap:8px;position:fixed;z-index:31;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;font:inherit;font-size:13px;letter-spacing:.04em;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:999px;padding:7px 14px;box-shadow:var(--shadow);cursor:pointer}
+  .mb-i{width:14px;height:10px;background:linear-gradient(var(--ink),var(--ink)) 0 0/100% 1.5px no-repeat,linear-gradient(var(--ink),var(--ink)) 0 50%/100% 1.5px no-repeat,linear-gradient(var(--ink),var(--ink)) 0 100%/100% 1.5px no-repeat}
+  .shell>.wrap{padding-top:76px}
+}
+@media (prefers-reduced-motion:reduce){.side{transition:none}}
 @media (max-width:640px){
   .databar{grid-template-columns:1fr}
   .wrap{padding-inline:16px;padding-block:36px 56px;gap:28px}
@@ -231,6 +258,13 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 </style>
 </head>
 <body>
+<button class="menu-btn" id="menuBtn" type="button" aria-controls="side" aria-expanded="false"><span class="mb-i" aria-hidden="true"></span>Menu</button>
+<div class="scrim" id="scrim" hidden></div>
+<div class="shell">
+<aside class="side" id="side" aria-label="Page menu">
+  <a class="side-brand" href="#top"><span class="sb-t">LEGENDS Codex</span><span class="sb-s">Prontera 1</span></a>
+  <nav id="sideNav"></nav>
+</aside>
 <div class="wrap" id="top">
   <header style="display:grid;gap:10px">
     <div class="eyebrow" id="eyebrow"></div>
@@ -243,16 +277,16 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
   </section>
   <hr class="rule">
 
-  <section aria-labelledby="h-find">
+  <section id="summary" class="anchor" aria-labelledby="h-find">
     <div class="sec-head"><div><h3 id="h-find">What the data shows</h3></div></div>
     <ul class="findings" id="findings"></ul>
   </section>
 
   <nav class="index" id="index" aria-label="Jump to a class"></nav>
 
-  <div class="part"><span class="pn">Part I</span><h2>Every class, every stat</h2></div>
+  <div class="part anchor" id="part1"><span class="pn">Part I</span><h2>Every class, every stat</h2></div>
 
-  <section class="sheet" aria-labelledby="h-mx">
+  <section class="sheet anchor" id="medians" aria-labelledby="h-mx">
     <div class="sec-head">
       <div><h3 id="h-mx">Class medians</h3>
       <p>Each cell is the class median. Shade shows where that median sits against the stat's baseline: defence stats against every character; Ignore P.DEF and P.DMG Bonus against physical attackers; Ignore M.DEF and M.DMG Bonus against magic attackers; Demi-Human DMG, Medium DMG and PVP Bonus against all attackers; Ignore P.DEF for defence/support classes against other defence/support characters. A gold outline marks the class with the highest median (classes with 3 or more members). Striped cells are stats not read for that class. Click a class to jump to it.</p></div>
@@ -261,7 +295,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
     <div id="matrixWrap"></div>
   </section>
 
-  <section class="sheet" aria-labelledby="h-lines">
+  <section class="sheet anchor" id="charts" aria-labelledby="h-lines">
     <div class="sec-head">
       <div><h3 id="h-lines">Highest and median, class by class</h3>
       <p id="multiDesc"></p></div>
@@ -271,10 +305,10 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
     <p class="codes" id="codes"></p>
   </section>
 
-  <div class="part"><span class="pn">Part II</span><h2>Class by class</h2><span class="s">Each stat on its own card</span></div>
+  <div class="part anchor" id="part2"><span class="pn">Part II</span><h2>Class by class</h2><span class="s">Each stat on its own card</span></div>
   <div id="classes" style="display:grid;gap:36px;min-width:0"></div>
 
-  <details class="sheet" id="upd">
+  <details class="sheet anchor" id="upd">
     <summary>Data freshness <span id="updCount"></span></summary>
     <p class="muted" style="margin:10px 0 0;font-size:14px" id="updNote"></p>
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px"><button class="btn" id="copyBtn" type="button">Copy list for Discord</button><span id="copyNote" role="status" class="muted" style="font-size:13px"></span></div>
@@ -282,7 +316,8 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
     <textarea id="copyFallback" hidden readonly aria-label="List text"></textarea>
   </details>
 
-  <div class="foot" id="foot"></div>
+  <div class="foot anchor" id="foot"></div>
+</div>
 </div>
 <div id="tip" hidden></div>
 
@@ -292,7 +327,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 const EMBED=JSON.parse(document.getElementById('data').textContent);
 const current={draw:()=>{},copyText:'',D:null};
 function render(D){
-['findings','index','scale','matrixWrap','legendMulti','multi','classes','actions','foot'].forEach(id=>{document.getElementById(id).textContent='';});
+['findings','index','scale','matrixWrap','legendMulti','multi','classes','actions','foot','sideNav'].forEach(id=>{document.getElementById(id).textContent='';});
 document.getElementById('copyNote').textContent='';document.getElementById('copyFallback').hidden=true;
 current.D=D;
 const M=D.members;
@@ -364,6 +399,16 @@ document.getElementById('eyebrow').textContent=`LEGENDS · Prontera 1 · Ragnaro
   if(lows&&lows.d.length>=2)add(lows.a.length?`${lows.c.name} is the most one-sided class`:`${lows.c.name} is the thinnest on defence`,`${lows.a.length?`It leads ${list(lows.a)}, and h`:'H'}as the lowest median of any class with 3 or more members on ${num(lows.d.length)} defence stats: ${list(lows.d)}.`);
 })();
 
+
+/* side menu */
+(function(){const N=document.getElementById('sideNav');
+  const sec=(title)=>{const d=H('div','sn-sec',null,N);H('div','sn-h',title,d);const ul=H('ul',null,null,d);return ul;};
+  const item=(ul,href,label,count,cls)=>{const li=H('li',null,null,ul);const a=H('a',cls||null,label,li);a.href='#'+href;a.dataset.target=href;if(count!=null)H('span','sn-n',String(count),a);return a;};
+  let ul=sec('Overview');item(ul,'summary','What the data shows');item(ul,'medians','Class medians');item(ul,'charts','Highest and median');
+  ['phys','mag','sup'].forEach(g=>{const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;const u=sec(GT[g].replace(' classes',''));
+    cl.forEach(c=>item(u,c.slug,c.name,c.members.length));});
+  ul=sec('More');item(ul,'upd','Data freshness');item(ul,'foot','How it is calculated');
+})();
 /* tooltip helpers */
 const tip=document.getElementById('tip');
 function moveTip(ev){const pad=16,w=tip.offsetWidth,h=tip.offsetHeight;let x=ev.clientX+pad,y=ev.clientY+pad;if(x+w>innerWidth-8)x=ev.clientX-w-pad;if(y+h>innerHeight-8)y=ev.clientY-h-pad;tip.style.left=Math.max(8,x)+'px';tip.style.top=Math.max(8,y)+'px';}
@@ -467,7 +512,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
   if(mm.age>14)H('div','nm',`Data ${Math.floor(mm.age)} days old`,tip);tip.hidden=false;moveTip(e);}
 ['phys','mag','sup'].forEach(g=>{
   const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;
-  const gt=H('div','gtitle',null,box);H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${g==='sup'?'8 stats: the 7 defence stats and Ignore P.DEF':'12 stats'}`,gt);
+  const gt=H('div','gtitle anchor',null,box);gt.id='g-'+g;H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${g==='sup'?'8 stats: the 7 defence stats and Ignore P.DEF':'12 stats'}`,gt);
   cl.forEach(c=>{
     const sec=H('section','sheet cls',null,box);sec.id=c.slug;
     const ch=H('div','ch',null,sec);H('h3',null,c.name,ch);H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''}`,ch);
@@ -569,6 +614,22 @@ document.getElementById('copyBtn').addEventListener('click',()=>{const note=docu
 let lastW=0,rt;const obs=document.getElementById('classes');new ResizeObserver(()=>{const w=obs.clientWidth;if(w===lastW)return;lastW=w;clearTimeout(rt);rt=setTimeout(()=>current.draw(),100);}).observe(obs);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>requestAnimationFrame(()=>current.draw()));
 
+
+/* side menu: highlight the section in view, drawer on small screens */
+const side=document.getElementById('side'),menuBtn=document.getElementById('menuBtn'),scrim=document.getElementById('scrim');
+const setOpen=o=>{side.classList.toggle('open',o);scrim.hidden=!o;menuBtn.setAttribute('aria-expanded',String(o));menuBtn.lastChild.textContent=o?'Close':'Menu';};
+menuBtn.addEventListener('click',()=>setOpen(!side.classList.contains('open')));
+scrim.addEventListener('click',()=>setOpen(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false);});
+side.addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;if(a.hash==='#upd'){const d=document.getElementById('upd');if(d)d.open=true;}setOpen(false);});
+let spy=null;
+function watchSections(){if(spy)spy.disconnect();const links=[...document.querySelectorAll('#sideNav a')];const byId=new Map(links.map(a=>[a.dataset.target,a]));
+  const vis=new Map();
+  spy=new IntersectionObserver(ents=>{ents.forEach(en=>vis.set(en.target.id,en.isIntersecting?en.boundingClientRect.top:null));
+    let best=null,bt=Infinity;for(const [id,top] of vis){if(top!=null&&byId.has(id)&&Math.abs(top)<bt){bt=Math.abs(top);best=id;}}
+    if(best){links.forEach(a=>a.classList.toggle('on',a.dataset.target===best));const on=byId.get(best);if(on&&side.scrollHeight>side.clientHeight){const r=on.getBoundingClientRect(),s=side.getBoundingClientRect();if(r.top<s.top+60||r.bottom>s.bottom-20)on.scrollIntoView({block:'nearest'});}}
+  },{rootMargin:'-10% 0px -60% 0px'});
+  byId.forEach((a,id)=>{const el=document.getElementById(id);if(el)spy.observe(el);});}
 /* ---------- CSV → dataset (same rules as the offline build) ---------- */
 const med=a=>{const v=a.slice().sort((p,q)=>p-q);const n=v.length;if(!n)return null;return n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2;};
 function H(tag,cls,text,p){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;if(p)p.appendChild(e);return e;}
@@ -628,7 +689,7 @@ function buildData(text,name){
 /* ---------- loading: data.csv from the repository; the copy built into the page is the fallback ---------- */
 try{localStorage.removeItem('roocstats.upload.v1');}catch(e){}
 const dsText=document.getElementById('dsText'),dsMsg=document.getElementById('dsMsg');
-function show(D){render(D);dsText.textContent='';H('b',null,D.name,dsText);dsText.appendChild(document.createTextNode(` · ${D.count} characters · newest update ${D.ref}`));}
+function show(D){render(D);watchSections();dsText.textContent='';H('b',null,D.name,dsText);dsText.appendChild(document.createTextNode(` · ${D.count} characters · newest update ${D.ref}`));}
 show(buildData(EMBED.text,EMBED.name));
 (async()=>{let txt;try{const r=await fetch('data.csv',{cache:'no-store'});if(!r.ok)return;txt=await r.text();}catch(e){return;}
   try{show(buildData(txt,'data.csv'));}catch(e){dsMsg.textContent=`data.csv could not be read (${e.message}) The page is showing the copy built into it instead.`;dsMsg.classList.add('bad');}
