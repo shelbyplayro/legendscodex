@@ -196,7 +196,7 @@ details.mem .tbl-wrap{margin-top:12px}
 .mtab td .sub{display:block;color:var(--muted);font-size:11.5px}
 .top-link{font-size:12.5px;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--axis)}
 .top-link:hover{color:var(--ink);border-bottom-color:var(--gold)}
-#tip{position:fixed;z-index:10;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.55;box-shadow:var(--shadow);max-width:290px}
+#tip{position:fixed;z-index:60;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.55;box-shadow:var(--shadow);max-width:290px}
 #tip .tv{font-family:var(--f-display);font-weight:600;font-size:18px;line-height:1.2}
 #tip .tr{display:flex;justify-content:space-between;gap:16px;align-items:center}
 #tip .tr span:first-child{display:inline-flex;align-items:center;gap:8px;color:var(--ink-2)}
@@ -246,6 +246,21 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
   .shell>.wrap{padding-top:76px}
 }
 @media (prefers-reduced-motion:reduce){.side{transition:none}}
+.xbtn{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;flex:none;transition:background .15s,color .15s,border-color .15s}
+.xbtn:hover{background:var(--gold-wash);border-color:var(--gold);color:var(--ink)}
+.mc .mt{align-items:center}
+.card .ct{align-items:center}
+.card .ctr{display:inline-flex;align-items:center;gap:10px}
+.zoom{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 20px) 20px calc(env(safe-area-inset-bottom,0px) + 20px);background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(5px)}
+.zoom-box{width:min(1240px,100%);max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:28px 32px 24px;display:grid;gap:14px}
+.zoom-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.zoom-eye{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-text)}
+.zoom-head h3{font-size:clamp(26px,3.2vw,38px);margin-top:4px}
+.zoom-head p{margin:6px 0 0;color:var(--ink-2);font-size:14px;max-width:80ch}
+.zoom-x{font:inherit;font-size:13px;letter-spacing:.04em;border:1px solid var(--axis);background:transparent;color:var(--ink);border-radius:999px;padding:7px 16px;cursor:pointer;flex:none}
+.zoom-x:hover{background:var(--gold-wash);border-color:var(--gold)}
+html.zoomed{overflow:hidden}
+@media (max-width:640px){.zoom{padding:12px}.zoom-box{padding:18px 14px;border-radius:16px}}
 @media (max-width:640px){
   .databar{grid-template-columns:1fr}
   .wrap{padding-inline:16px;padding-block:36px 56px;gap:28px}
@@ -318,6 +333,13 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 
   <div class="foot anchor" id="foot"></div>
 </div>
+</div>
+<div class="zoom" id="zoom" hidden role="dialog" aria-modal="true" aria-labelledby="zoomTitle">
+  <div class="zoom-box">
+    <div class="zoom-head"><div><div class="zoom-eye" id="zoomEye"></div><h3 id="zoomTitle"></h3><p id="zoomSub"></p></div><button class="zoom-x" id="zoomClose" type="button" aria-label="Close the large view">Close</button></div>
+    <div id="zoomLegend"></div>
+    <div class="chart" id="zoomChart"></div>
+  </div>
 </div>
 <div id="tip" hidden></div>
 
@@ -421,6 +443,17 @@ function bandKey2(){const s=S('svg',{width:22,height:12,viewBox:'0 0 22 12','ari
 function hollowKey(){const s=S('svg',{width:12,height:12,viewBox:'0 0 12 12','aria-hidden':'true'});S('circle',{cx:6,cy:6,r:3.6,style:'fill:var(--surface);stroke:var(--sapphire);stroke-width:1.8'},s);return s;}
 function tipRow(col,lab,val,note){const rr=H('div','tr',null,tip);const a=H('span',null,null,rr);if(col)a.appendChild(dotKey(col,1));a.appendChild(document.createTextNode(lab));H('b','num',val,rr);if(note)H('div','nm',note,tip);}
 
+
+/* expand a chart into a large view */
+const EXPAND_SVG='M3 7V3h4 M13 3h4v4 M17 13v4h-4 M7 17H3v-4';
+function xbtn(label,onClick){const b=H('button','xbtn',null,null);b.type='button';b.title=label;b.setAttribute('aria-label',label);
+  const s=S('svg',{width:14,height:14,viewBox:'0 0 20 20','aria-hidden':'true'},b);S('path',{d:EXPAND_SVG,style:'fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round'},s);
+  b.addEventListener('click',e=>{e.stopPropagation();onClick(b);});return b;}
+function openZoom(from,eye,title,sub,legendNode,draw){const Z=document.getElementById('zoom');
+  document.getElementById('zoomEye').textContent=eye;document.getElementById('zoomTitle').textContent=title;document.getElementById('zoomSub').textContent=sub||'';
+  const L=document.getElementById('zoomLegend');L.textContent='';if(legendNode)L.appendChild(legendNode.cloneNode(true));
+  const cb=document.getElementById('zoomChart');Z.hidden=false;document.documentElement.classList.add('zoomed');
+  current.zoom={from,draw:()=>draw(cb,{h:Math.max(300,Math.min(560,Math.round(innerHeight*0.56)))})};requestAnimationFrame(()=>{current.zoom.draw();document.getElementById('zoomClose').focus();});}
 /* smooth monotone curve (no overshoot between points) */
 function curve(p){const n=p.length;if(!n)return '';if(n===1)return `M${p[0][0]} ${p[0][1]}`;
   const dx=[],m=[];for(let i=0;i<n-1;i++){dx[i]=p[i+1][0]-p[i][0];m[i]=(p[i+1][1]-p[i][1])/dx[i];}
@@ -472,10 +505,10 @@ const tickFmt=(v,u,step)=>u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.r
   document.getElementById('codes').textContent='Class codes: '+CLS.map(c=>`${c.ab} ${c.name}`).join(' · ');})();
 const multiBoxes=[];
 (function(){const box=document.getElementById('multi');STATS.forEach(s=>{const d=H('div','mc',null,box);const mt=H('div','mt',null,d);const h=H('h4',null,s.name,mt);H('small',null,s.side,h);
-  const lead=LEAD[s.k].map(cname).join(', ');H('span',null,`${lead?`Highest median: ${lead}`:''}${BASE[s.k]?` · baseline: ${BASE[s.k]}${s.k==='ip'?'; defence/support classes against each other':''}`:''}`,mt);const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
-function drawMulti(cb,s){
+  const lead=LEAD[s.k].map(cname).join(', ');H('span',null,`${lead?`Highest median: ${lead}`:''}${BASE[s.k]?` · baseline: ${BASE[s.k]}${s.k==='ip'?'; defence/support classes against each other':''}`:''}`,mt);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
+function drawMulti(cb,s,opt){
   cb.textContent='';const W=Math.max(280,cb.clientWidth),narrow=W<460;const u=UNIT[s.k];
-  const m={l:narrow?40:48,r:8,t:12,b:narrow?40:26};const Hh=narrow?210:210;
+  const m={l:narrow?40:48,r:8,t:12,b:narrow?40:26};const Hh=opt&&opt.h?opt.h:210;
   const svg=S('svg',{viewBox:`0 0 ${W} ${Hh}`,role:'img','aria-label':`${s.name}: highest and median by class`},cb);
   const vals=CLS.filter(c=>uses(c,s.k)).flatMap(c=>c.members.map(z=>z[s.k])).filter(v=>v!=null);if(!vals.length)return;
   const lo=Math.min(...vals),hi=Math.max(...vals);const nt=niceTicks(Math.max(0,lo-(hi-lo)*0.06),hi+(hi-lo)*0.06,4);
@@ -534,9 +567,10 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
     a=H('span',null,null,lg);a.appendChild(hollowKey());a.appendChild(document.createTextNode('Data older than 14 days'));
     const cards=H('div','cards',null,sec);
     c.stats.forEach(s=>{const x=c.st[s.k],u=UNIT[s.k];const cd=H('article','card',null,cards);
-      const ct=H('div','ct',null,cd);H('b',null,s.name,ct);H('span',null,s.side,ct);
+      const ct=H('div','ct',null,cd);H('b',null,s.name,ct);const ctr=H('span','ctr',null,ct);H('span',null,s.side,ctr);
       if(!x.n){H('div','nod','No data for this class',cd);return;}
       const cv=H('div','cv',null,cd);H('strong',null,fmt(x.med,u),cv);const kb=bk(s.k,c);H('span',null,`class median · ${BASE[kb]?`median of ${BASE[kb]}`:'guild median'} ${fmt(GMED[kb],u)}`,cv);
+      ctr.appendChild(xbtn(`Expand ${s.name} chart for ${c.name}`,b=>openZoom(b,`${c.name} · ${s.side} stat`,s.name,`Class median ${fmt(x.med,u)} · ${BASE[kb]?`median of ${BASE[kb]}`:'guild median'} ${fmt(GMED[kb],u)}`,lg,(z,o)=>drawMember(z,c,s,o))));
       const cb=H('div','chart mchart',null,cd);memberCharts.push({cb,c,s});
       const nd=c.members.filter(mm=>mm[s.k]==null).map(mm=>mm.c);if(nd.length)H('div','nod',`No data: ${list(nd)}`,cd);
     });
@@ -552,11 +586,11 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
   });
 });
 function quant(a,q){if(!a.length)return null;const p=(a.length-1)*q,i=Math.floor(p),f=p-i;return a[i]+(a[Math.min(i+1,a.length-1)]-a[i])*f;}
-function drawMember(cb,c,s){
+function drawMember(cb,c,s,opt){
   cb.textContent='';const W=Math.max(260,cb.clientWidth),u=UNIT[s.k],x=c.st[s.k];
   const rows=x.has.slice().sort((p,q)=>q[s.k]-p[s.k]);const n=rows.length;
   const spacing=(W-60)/Math.max(n,1);const rot=rows.some(r=>r.c.length*6.2>spacing-6);
-  const m={l:48,r:84,t:14,b:rot?Math.min(78,18+Math.max(...rows.map(r=>Math.min(r.c.length,14)))*5.2):26};const Hh=200+m.b;
+  const m={l:48,r:84,t:14,b:rot?Math.min(78,18+Math.max(...rows.map(r=>Math.min(r.c.length,14)))*5.2):26};const Hh=(opt&&opt.h?opt.h:200)+m.b;
   const svg=S('svg',{viewBox:`0 0 ${W} ${Hh}`,role:'img','aria-label':`${s.name}: ${c.name} members from highest to lowest, with class and baseline medians`},cb);
   const kb=bk(s.k,c);const A=SORTED[kb];const vals=rows.map(r=>r[s.k]).concat([A[0],A[A.length-1]]);
   const lo=Math.min(...vals),hi=Math.max(...vals);const nt=niceTicks(Math.max(0,lo-(hi-lo)*0.06),hi+(hi-lo)*0.08,4);
@@ -620,7 +654,13 @@ const side=document.getElementById('side'),menuBtn=document.getElementById('menu
 const setOpen=o=>{side.classList.toggle('open',o);scrim.hidden=!o;menuBtn.setAttribute('aria-expanded',String(o));menuBtn.lastChild.textContent=o?'Close':'Menu';};
 menuBtn.addEventListener('click',()=>setOpen(!side.classList.contains('open')));
 scrim.addEventListener('click',()=>setOpen(false));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false);});
+const zoomEl=document.getElementById('zoom');
+function closeZoom(){if(zoomEl.hidden)return;zoomEl.hidden=true;document.documentElement.classList.remove('zoomed');document.getElementById('zoomChart').textContent='';tip.hidden=true;const f=current.zoom&&current.zoom.from;current.zoom=null;if(f&&f.focus)f.focus();}
+const tip=document.getElementById('tip');
+document.getElementById('zoomClose').addEventListener('click',closeZoom);
+zoomEl.addEventListener('click',e=>{if(e.target===zoomEl)closeZoom();});
+let zr;addEventListener('resize',()=>{if(!current.zoom)return;clearTimeout(zr);zr=setTimeout(()=>current.zoom&&current.zoom.draw(),120);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!zoomEl.hidden)closeZoom();else setOpen(false);}});
 side.addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;if(a.hash==='#upd'){const d=document.getElementById('upd');if(d)d.open=true;}setOpen(false);});
 let spy=null;
 function watchSections(){if(spy)spy.disconnect();const links=[...document.querySelectorAll('#sideNav a')];const byId=new Map(links.map(a=>[a.dataset.target,a]));
