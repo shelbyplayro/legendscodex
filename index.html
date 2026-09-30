@@ -7,7 +7,7 @@
 <title>LEGENDS Codex</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@300;400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@300;400;500;600&family=Prompt:wght@300;400;500;600&display=swap">
 <style>
 [hidden]{display:none!important}
 img{max-width:100%}
@@ -22,8 +22,8 @@ img{max-width:100%}
   --t1:#16171a; --t2:#16171a; --t3:#16171a; --t4:#ffffff; --t5:#ffffff;
   --warn:#fab219; --serious:#ec835a;
   --shadow:0 1px 2px rgba(22,23,26,.04),0 8px 28px rgba(22,23,26,.05);
-  --f-display:"Cormorant Garamond","IBM Plex Sans Thai",Georgia,serif;
-  --f-body:"Manrope","IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-display:"Cormorant Garamond","Prompt",Georgia,serif;
+  --f-body:"Montserrat","Prompt",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0e0f11; --surface:#16171a; --ink:#efece6; --ink-2:#b8b5ae; --muted:#86858a;
@@ -46,7 +46,7 @@ img{max-width:100%}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;margin:0;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14.5px;line-height:1.65;margin:0;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1160px;margin:0 auto;padding-inline:24px;padding-block:56px 80px;display:grid;grid-template-columns:minmax(0,1fr);gap:36px}
 .wrap>*{min-width:0}
 h1,h2,h3,h4{font-family:var(--f-display);font-weight:500;text-wrap:balance;margin:0;line-height:1.1;letter-spacing:-.005em}
@@ -104,7 +104,7 @@ td.lead{font-weight:600;box-shadow:inset 0 0 0 2px var(--gold)}
 .matrix .cn{color:var(--muted);font-size:11px;margin-left:5px}
 .matrix.compact td,.matrix.compact th{padding:6px 5px;font-size:12px}
 .matrix.compact td.stick{font-size:12.5px;white-space:normal;line-height:1.3}
-@media (max-width:1100px){.matrix.compact td{padding:6px 3px;font-size:11.5px}}
+@media (max-width:1100px){.matrix.compact td{padding:6px 3px;font-size:11.5px}.matrix.compact thead th{font-size:9px;letter-spacing:.02em;padding-inline:3px}table.compact:not(.matrix) td,table.compact:not(.matrix) th{padding-inline:6px}}
 .matrix.compact thead tr.grp th{font-size:13.5px;padding:6px 4px}
 .matrix.compact thead th{font-size:9.5px;letter-spacing:.06em;vertical-align:bottom}
 .hl{display:block;line-height:1.3;white-space:nowrap}
@@ -219,6 +219,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 .databar .dl{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-text);margin-right:12px}
 .databar .dsmsg{grid-column:1/-1;margin:0;font-size:12.5px;color:var(--muted)}
 .databar .dsmsg.bad{color:var(--serious)}
+.databar .dsmsg:empty{display:none}
 .shell{display:grid;grid-template-columns:236px minmax(0,1fr);max-width:1440px;margin:0 auto}
 .shell>.wrap{margin:0;max-width:1160px}
 .side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:48px 14px 32px 24px;border-right:1px solid var(--line);scrollbar-width:thin}
@@ -284,11 +285,10 @@ html.zoomed{overflow:hidden}
   <header style="display:grid;gap:10px">
     <div class="eyebrow" id="eyebrow"></div>
     <h1>LEGENDS Codex</h1>
-    <p class="lede">Part I is the overview of every class on every stat. Part II goes class by class and sets out each stat on its own card. Physical attack classes are read on Ignore P.DEF and P.DMG Bonus, magic attack classes on Ignore M.DEF and M.DMG Bonus. Attack stats are measured against attackers only; defence stats against the whole guild. Defence/support classes also show Ignore P.DEF, measured against other defence/support characters.</p>
   </header>
   <section class="databar" aria-label="Data source">
     <div class="ds"><span class="dl">Data</span><span id="dsText"></span></div>
-    <p id="dsMsg" class="dsmsg" role="status">Everything on this page is calculated from data.csv in the GitHub repository. Replace that file to update the page.</p>
+    <p id="dsMsg" class="dsmsg" role="status"></p>
   </section>
   <hr class="rule">
 
@@ -304,7 +304,7 @@ html.zoomed{overflow:hidden}
   <section class="sheet anchor" id="medians" aria-labelledby="h-mx">
     <div class="sec-head">
       <div><h3 id="h-mx">Class medians</h3>
-      <p>Each cell is the class median. Shade shows where that median sits against the stat's baseline: defence stats against every character; Ignore P.DEF and P.DMG Bonus against physical attackers; Ignore M.DEF and M.DMG Bonus against magic attackers; Demi-Human DMG, Medium DMG and PVP Bonus against all attackers; Ignore P.DEF for defence/support classes against other defence/support characters. A gold outline marks the class with the highest median (classes with 3 or more members). Striped cells are stats not read for that class. Click a class to jump to it.</p></div>
+      <p>Each cell is the class median, shaded by its percentile against the stat's baseline.</p></div>
       <div class="scale" id="scale"></div>
     </div>
     <div id="matrixWrap"></div>
@@ -320,12 +320,11 @@ html.zoomed{overflow:hidden}
     <p class="codes" id="codes"></p>
   </section>
 
-  <div class="part anchor" id="part2"><span class="pn">Part II</span><h2>Class by class</h2><span class="s">Each stat on its own card</span></div>
+  <div class="part anchor" id="part2"><span class="pn">Part II</span><h2>Class by class</h2></div>
   <div id="classes" style="display:grid;gap:36px;min-width:0"></div>
 
   <details class="sheet anchor" id="upd">
     <summary>Data freshness <span id="updCount"></span></summary>
-    <p class="muted" style="margin:10px 0 0;font-size:14px" id="updNote"></p>
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px"><button class="btn" id="copyBtn" type="button">Copy list for Discord</button><span id="copyNote" role="status" class="muted" style="font-size:13px"></span></div>
     <div class="act-grid" id="actions"></div>
     <textarea id="copyFallback" hidden readonly aria-label="List text"></textarea>
@@ -501,11 +500,11 @@ const tickFmt=(v,u,step)=>u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.r
   a=H('span',null,null,L);a.appendChild(lineKey('var(--gold)'));a.appendChild(document.createTextNode('Class median'));
   a=H('span',null,null,L);a.appendChild(bandKey());a.appendChild(document.createTextNode('Gap between them'));
   a=H('span',null,null,L);a.appendChild(hKey('var(--base)'));a.appendChild(document.createTextNode('Baseline median'));
-  document.getElementById('multiDesc').textContent=`Each chart runs across the ${CLS.length} classes in the same order. Point at a class to see who holds the highest value. A class without a point has no data for that stat or does not read it.`;
+  document.getElementById('multiDesc').textContent=`Point at a class to see who holds the highest value.`;
   document.getElementById('codes').textContent='Class codes: '+CLS.map(c=>`${c.ab} ${c.name}`).join(' · ');})();
 const multiBoxes=[];
 (function(){const box=document.getElementById('multi');STATS.forEach(s=>{const d=H('div','mc',null,box);const mt=H('div','mt',null,d);const h=H('h4',null,s.name,mt);H('small',null,s.side,h);
-  const lead=LEAD[s.k].map(cname).join(', ');H('span',null,`${lead?`Highest median: ${lead}`:''}${BASE[s.k]?` · baseline: ${BASE[s.k]}${s.k==='ip'?'; defence/support classes against each other':''}`:''}`,mt);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
+  const lead=LEAD[s.k].map(cname).join(', ');H('span',null,lead?`Highest median: ${lead}`:'',mt);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
 function drawMulti(cb,s,opt){
   cb.textContent='';const W=Math.max(280,cb.clientWidth),narrow=W<460;const u=UNIT[s.k];
   const m={l:narrow?40:48,r:8,t:12,b:narrow?40:26};const Hh=opt&&opt.h?opt.h:210;
@@ -545,20 +544,20 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
   if(mm.age>14)H('div','nm',`Data ${Math.floor(mm.age)} days old`,tip);tip.hidden=false;moveTip(e);}
 ['phys','mag','sup'].forEach(g=>{
   const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;
-  const gt=H('div','gtitle anchor',null,box);gt.id='g-'+g;H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${g==='sup'?'8 stats: the 7 defence stats and Ignore P.DEF':'12 stats'}`,gt);
+  const gt=H('div','gtitle anchor',null,box);gt.id='g-'+g;H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${g==='sup'?'8 stats':'12 stats'}`,gt);
   cl.forEach(c=>{
     const sec=H('section','sheet cls',null,box);sec.id=c.slug;
     const ch=H('div','ch',null,sec);H('h3',null,c.name,ch);H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''}`,ch);
     const wd=c.stats.filter(s=>c.st[s.k].n);
     const above=wd.filter(s=>c.st[s.k].med>GMED[bk(s.k,c)]).map(s=>s.name),below=wd.filter(s=>c.st[s.k].med<GMED[bk(s.k,c)]).map(s=>s.name);
     const sum=H('p','sum',null,sec);const tx=s=>sum.appendChild(document.createTextNode(s));
-    if(wd.length){H('b',null,`Class median above the baseline median on ${above.length} of ${wd.length} stats${above.length?': ':'.'}`,sum);if(above.length)tx(list(above)+'. ');
-      if(below.length){H('b',null,'Below: ',sum);tx(list(below)+'. ');}
+    if(wd.length){if(!above.length)H('b',null,`Class median below baseline on ${below.length===wd.length?'every stat':`${below.length} of ${wd.length} stats`}. `,sum);
+      else if(above.length===wd.length)H('b',null,`Class median above baseline on every stat. `,sum);
+      else{H('b',null,`Class median above baseline on ${above.length} of ${wd.length} stats: `,sum);tx(list(above)+'. ');}
       const leads=c.stats.filter(s=>LEADK[bk(s.k,c)].includes(c.k)).map(s=>s.name+(bk(s.k,c)==='ip_sup'?' (among defence/support classes)':'')+(LEADK[bk(s.k,c)].length>1?' (tied)':''));
-      if(leads.length){H('b',null,'Highest class median in the guild for: ',sum);tx(list(leads)+'.');}
-      if(c.members.length<3)tx(` With ${c.members.length} ${c.members.length===1?'member':'members'}, this describes individual characters rather than a class trend.`);
+      if(leads.length){H('b',null,'Highest class median in the guild: ',sum);tx(list(leads)+'.');}
+      if(c.members.length<3)tx(` Based on ${c.members.length} ${c.members.length===1?'member':'members'} only.`);
       const miss=c.stats.filter(s=>!c.st[s.k].n).map(s=>s.name);if(miss.length)tx(` No data for ${list(miss)}.`);}
-    H('div','sub-h','Each stat',sec);
     const lg=H('div','legend',null,sec);let a;
     a=H('span',null,null,lg);a.appendChild(lineKey('var(--sapphire)'));a.appendChild(document.createTextNode('Members, highest to lowest'));
     a=H('span',null,null,lg);a.appendChild(hKey('var(--gold)'));a.appendChild(document.createTextNode('Class median'));
@@ -574,7 +573,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
       const cb=H('div','chart mchart',null,cd);memberCharts.push({cb,c,s});
       const nd=c.members.filter(mm=>mm[s.k]==null).map(mm=>mm.c);if(nd.length)H('div','nod',`No data: ${list(nd)}`,cd);
     });
-    const det=H('details','mem',null,sec);const su=H('summary',null,'Every member',det);H('span',null,`${c.members.length} ${c.members.length===1?'member':'members'} · bold = above the baseline median`,su);
+    const det=H('details','mem',null,sec);const su=H('summary',null,'Every member',det);H('span',null,`${c.members.length} ${c.members.length===1?'member':'members'} · bold = above baseline`,su);
     const tw=H('div','tbl-wrap mtab',null,det);const t=H('table','compact',null,tw);const hr=H('tr',null,null,H('thead',null,null,t));
     H('th','stick','Character',hr);H('th','r','Power',hr);c.stats.forEach(s=>{const h=H('th','r',null,hr);h.title=s.name;s.lab.forEach(l=>H('span','hl',l,h));});
     const tb=H('tbody',null,null,t);
@@ -610,7 +609,7 @@ function drawMember(cb,c,s,opt){
   const pts=rows.map((r,i)=>[X(i),Y(r[s.k])]);
   if(n>1)S('path',{d:curve(pts),style:'fill:none;stroke:var(--sapphire);stroke-width:2;stroke-linecap:round;stroke-linejoin:round'},svg);
   rows.forEach((r,i)=>{const st=r.age>14;S('circle',{cx:pts[i][0],cy:pts[i][1],r:i===0?4.6:3.8,style:st?'fill:var(--surface);stroke:var(--sapphire);stroke-width:2':'fill:var(--sapphire);stroke:var(--surface);stroke-width:2'},svg);});
-  const lab=(i)=>{const tt=S('text',{x:pts[i][0],y:pts[i][1]-9,'text-anchor':'middle','font-size':10.5,'font-weight':600,style:'fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px'},svg);tt.textContent=fmt(rows[i][s.k],u);};
+  const lab=(i)=>{const ed=n>1&&i===n-1,st=n>1&&i===0;const tt=S('text',{x:pts[i][0]+(ed?5:st?-5:0),y:pts[i][1]-9,'text-anchor':ed?'end':st?'start':'middle','font-size':10.5,'font-weight':600,style:'fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px'},svg);tt.textContent=fmt(rows[i][s.k],u);};
   if(n<=6)rows.forEach((r,i)=>lab(i));else{lab(0);lab(n-1);}
   rows.forEach((r,i)=>{const nm=r.c.length>14?r.c.slice(0,13)+'…':r.c;const xx=pts[i][0],yy=m.t+ph+14;
     const tt=rot?S('text',{x:xx,y:yy,'text-anchor':'end','font-size':10.5,transform:`rotate(-50 ${xx} ${yy})`,style:'fill:var(--ink-2)'},svg):S('text',{x:xx,y:yy+2,'text-anchor':'middle','font-size':11,style:'fill:var(--ink-2)'},svg);tt.textContent=nm;});
@@ -629,15 +628,15 @@ let copyText='';
   groups.forEach(([title,f])=>{const ms=M.filter(f).sort((a,b)=>b.age-a.age);if(!ms.length)return;total+=ms.length;const col=H('div','act-col',null,A);H('h4',null,`${title} · ${ms.length}`,col);const ul=H('ul',null,null,col);lines.push(`**${title}**`);
     ms.forEach(m=>{const li=H('li',null,null,ul);const c=CLS.find(z=>z.k===m.b);H('b',null,`${m.c} · ${c?c.name:m.cls}`,li);H('span',null,`${m.d} · ${Math.floor(m.age)} days old`,li);lines.push(`- ${m.d} (${m.c}) ${Math.floor(m.age)} days old`);});});
   document.getElementById('updCount').textContent=`· ${total} of ${M.length} characters older than 14 days`;
-  document.getElementById('updNote').textContent=`Values for these characters may have changed since they were recorded, so a class's highest or median can shift once they update. Age is the oldest of the three stat sections (General, Advanced, Special), counted back from the newest update in the file (${D.ref}).`;
   copyText=lines.length?`Please update your stats in the tracker\n${lines.join('\n')}`:'';})();
 current.copyText=copyText;
 
 /* footnote */
 (function(){const f=document.getElementById('foot');
-  H('p',null,'Physical attack classes and magic attack classes are read on 12 stats: Ignore M.DEF and M.DMG Bonus are left out for physical classes, Ignore P.DEF and P.DMG Bonus for magic classes. Defence/support classes are read on the 7 defence stats plus Ignore P.DEF. Summoner is split by build (physical, magic, support) from its P.ATK and M.ATK because the builds carry very different stats.',f);
-  H('p',null,'Baselines: attack stats use attackers only (physical attackers for Ignore P.DEF and P.DMG Bonus, magic attackers for Ignore M.DEF and M.DMG Bonus, all attackers for Demi-Human DMG, Medium DMG and PVP Bonus), because defence characters do not build them to the same level. Ignore P.DEF for defence/support classes is compared only with other defence/support characters. Defence stats use every character. Percentile = the share of the baseline with a lower value. raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); raw M.DEF uses M.DEF and Equipment M.DEF% the same way. DMG Bonus and DMG Reduction are the % values.',f);
-  if(D.notes&&D.notes.length)H('p',null,'Clearly misread values are left out: '+list(D.notes)+'.',f);})();
+  H('p',null,'Physical attack classes leave out Ignore M.DEF and M.DMG Bonus; magic attack classes leave out Ignore P.DEF and P.DMG Bonus. Defence/support classes show the 7 defence stats plus Ignore P.DEF. Summoner is split into physical, magic and support builds by its P.ATK and M.ATK.',f);
+  H('p',null,'Baselines: physical attackers for Ignore P.DEF and P.DMG Bonus; magic attackers for Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; defence/support characters for their own Ignore P.DEF; every character for defence stats. Percentile is the share of the baseline with a lower value. Class leaders count only classes with 3 or more members.',f);
+  H('p',null,'raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); raw M.DEF uses M.DEF and Equipment M.DEF% the same way. Data age is the oldest of the General, Advanced and Special sections, counted from the newest update in the file ('+D.ref+').',f);
+  if(D.notes&&D.notes.length)H('p',null,'Left out as misread: '+list(D.notes)+'.',f);})();
 }
 
 /* ---------- shared, data-independent wiring ---------- */
@@ -732,7 +731,7 @@ const dsText=document.getElementById('dsText'),dsMsg=document.getElementById('ds
 function show(D){render(D);watchSections();dsText.textContent='';H('b',null,D.name,dsText);dsText.appendChild(document.createTextNode(` · ${D.count} characters · newest update ${D.ref}`));}
 show(buildData(EMBED.text,EMBED.name));
 (async()=>{let txt;try{const r=await fetch('data.csv',{cache:'no-store'});if(!r.ok)return;txt=await r.text();}catch(e){return;}
-  try{show(buildData(txt,'data.csv'));}catch(e){dsMsg.textContent=`data.csv could not be read (${e.message}) The page is showing the copy built into it instead.`;dsMsg.classList.add('bad');}
+  try{show(buildData(txt,'data.csv'));}catch(e){dsMsg.textContent=`data.csv could not be read (${e.message}), so the page shows its built-in copy.`;dsMsg.classList.add('bad');}
 })();
 window.roocstats={data:()=>current.D};
 })();
