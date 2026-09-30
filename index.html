@@ -107,6 +107,8 @@ td.lead{font-weight:600;box-shadow:inset 0 0 0 2px var(--gold)}
 @media (max-width:1100px){.matrix.compact td{padding:6px 3px;font-size:11.5px}.matrix.compact thead th{font-size:9px;letter-spacing:.02em;padding-inline:3px}table.compact:not(.matrix) td,table.compact:not(.matrix) th{padding-inline:6px}}
 .matrix.compact thead tr.grp th{font-size:13.5px;padding:6px 4px}
 .matrix.compact thead th{font-size:9.5px;letter-spacing:.06em;vertical-align:bottom}
+.matrix.compact thead tr.grp th.cls-m{vertical-align:middle;text-align:center;box-shadow:none}
+.matrix thead tr:not(.grp) th.r{text-align:center}
 .hl{display:block;line-height:1.3;white-space:nowrap}
 table.compact td,table.compact th{padding:6px 7px}
 .mtab table.compact{font-size:12px}
@@ -481,9 +483,9 @@ const tickFmt=(v,u,step)=>u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.r
 /* matrix: one compact table, stat pairs side by side */
 (function(){const wrap=document.getElementById('matrixWrap');const tw=H('div','tbl-wrap mx',null,wrap);const t=H('table','matrix compact',null,tw);
   const cg=H('colgroup',null,null,t);H('col','c0',null,cg);STATS.forEach(()=>H('col',null,null,cg));
-  const th=H('thead',null,null,t);const g=H('tr','grp',null,th);H('th','stick','',g);
+  const th=H('thead',null,null,t);const g=H('tr','grp',null,th);H('th','stick cls-m','Class',g).rowSpan=2;
   GROUPS.forEach(G=>{const c=H('th',null,G.t,g);c.colSpan=2;});
-  const r=H('tr',null,null,th);H('th','stick','Class',r);
+  const r=H('tr',null,null,th);
   STATS.forEach(s=>{const c=H('th','r',null,r);c.title=s.name;s.lab.forEach(l=>H('span','hl',l,c));});
   const tb=H('tbody',null,null,t);let last=null;
   CLS.forEach(c=>{if(c.gt!==last){last=c.gt;const gr=H('tr','gh',null,tb);const td=H('td',null,GT[last],gr);td.colSpan=STATS.length+1;}
