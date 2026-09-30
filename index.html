@@ -98,7 +98,20 @@ tr.medrow td{font-weight:600;border-top:1px solid var(--axis)}
 .b1{background:var(--h1);color:var(--t1)} .b2{background:var(--h2);color:var(--t2)} .b3{background:var(--h3);color:var(--t3)} .b4{background:var(--h4);color:var(--t4)} .b5{background:var(--h5);color:var(--t5)}
 td.na{color:var(--muted);background:repeating-linear-gradient(135deg,transparent 0 6px,var(--band) 6px 7px)}
 td.lead{font-weight:600;box-shadow:inset 0 0 0 2px var(--gold)}
-.matrix{border-spacing:4px}
+.matrix{border-spacing:3px;table-layout:fixed;width:100%;min-width:900px}
+.matrix col.c0{width:142px}
+.sheet:has(#matrixWrap){padding-inline:22px}
+.matrix .cn{color:var(--muted);font-size:11px;margin-left:5px}
+.matrix.compact td,.matrix.compact th{padding:6px 5px;font-size:12px}
+.matrix.compact td.stick{font-size:12.5px;white-space:normal;line-height:1.3}
+@media (max-width:1100px){.matrix.compact td{padding:6px 3px;font-size:11.5px}}
+.matrix.compact thead tr.grp th{font-size:13.5px;padding:6px 4px}
+.matrix.compact thead th{font-size:9.5px;letter-spacing:.06em;vertical-align:bottom}
+.hl{display:block;line-height:1.3;white-space:nowrap}
+table.compact td,table.compact th{padding:6px 7px}
+.mtab table.compact{font-size:12px}
+.mtab table.compact thead th{font-size:9.5px;letter-spacing:.06em;vertical-align:bottom}
+.mtab table.compact td.stick{min-width:130px}
 .matrix td,.matrix th{border-bottom:0}
 .matrix td{border-radius:8px}
 .matrix thead tr.grp th{border-bottom:0;background:var(--band);border-radius:8px}
@@ -127,7 +140,8 @@ td.lead{font-weight:600;box-shadow:inset 0 0 0 2px var(--gold)}
 .mc .mt span{font-size:12px;color:var(--muted)}
 .codes{font-size:12px;color:var(--muted);margin:14px 0 0}
 
-.cls{scroll-margin-top:20px;display:grid;gap:18px}
+.cls{scroll-margin-top:20px;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.cls>*{min-width:0}
 .cls .ch{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;align-items:baseline}
 .cls .ch h3{font-size:clamp(30px,3.6vw,40px)}
 .cls .meta{color:var(--muted);font-size:13px;letter-spacing:.02em}
@@ -244,7 +258,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
       <p>Each cell is the class median. Shade shows where that median sits against the stat's baseline: defence stats against every character; Ignore P.DEF and P.DMG Bonus against physical attackers; Ignore M.DEF and M.DMG Bonus against magic attackers; Demi-Human DMG, Medium DMG and PVP Bonus against all attackers; Ignore P.DEF for defence/support classes against other defence/support characters. A gold outline marks the class with the highest median (classes with 3 or more members). Striped cells are stats not read for that class. Click a class to jump to it.</p></div>
       <div class="scale" id="scale"></div>
     </div>
-    <div class="tbl-wrap"><table class="matrix" id="matrix"></table></div>
+    <div id="matrixWrap"></div>
   </section>
 
   <section class="sheet" aria-labelledby="h-lines">
@@ -278,7 +292,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 const EMBED=JSON.parse(document.getElementById('data').textContent);
 const current={draw:()=>{},copyText:'',D:null};
 function render(D){
-['findings','index','scale','matrix','legendMulti','multi','classes','actions','foot'].forEach(id=>{document.getElementById(id).textContent='';});
+['findings','index','scale','matrixWrap','legendMulti','multi','classes','actions','foot'].forEach(id=>{document.getElementById(id).textContent='';});
 document.getElementById('copyNote').textContent='';document.getElementById('copyFallback').hidden=true;
 current.D=D;
 const M=D.members;
@@ -292,7 +306,8 @@ const GROUPS=[
   {n:7,t:'DMG Reduction',s:[['pr','P.DMG Reduction',['P.DMG','Red.'],'Defence'],['mdr','M.DMG Reduction',['M.DMG','Red.'],'Defence']]}
 ];
 const UNIT={rp:'',rm:'',ip:'',im:'',vb:'',vr:'',dd:'%',dr:'%',md:'%',mr:'%',pb:'%',mb:'%',pr:'%',mdr:'%'};
-const STATS=[];GROUPS.forEach((g,gi)=>g.s.forEach(([k,name,lab,side])=>STATS.push({k,name,lab,side,g,gi})));
+const SHORT={rp:'raw P.DEF',rm:'raw M.DEF',ip:'Ignore P.DEF',im:'Ignore M.DEF',dd:'Demi-Human',dr:'Demi-Human',md:'Medium',mr:'Medium',vb:'PVP',vr:'PVP',pb:'P.DMG',mb:'M.DMG',pr:'P.DMG',mdr:'M.DMG'};
+const STATS=[];GROUPS.forEach((g,gi)=>g.s.forEach(([k,name,lab,side])=>STATS.push({k,name,lab,side,g,gi,short:SHORT[k]})));
 const CLS=D.classes.map(c=>Object.assign({},c));
 const GT={phys:'Physical attack classes',mag:'Magic attack classes',sup:'Defence / support classes'};
 const SKIP={phys:['im','mb'],mag:['ip','pb'],sup:['im','dd','md','vb','pb','mb']};
@@ -386,19 +401,19 @@ const tickFmt=(v,u,step)=>u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.r
 (function(){const s=document.getElementById('scale');H('span',null,'Percentile',s);['0–20','20–40','40–60','60–80','80–100'].forEach((t,i)=>{const w=H('span',null,null,s);H('i','b'+(i+1),null,w);H('span',null,t,w);});
   let w=H('span',null,null,s);H('i','ld',null,w);H('span',null,'Class leader',w);w=H('span',null,null,s);H('i','nai',null,w);H('span',null,'Not read',w);})();
 
-/* matrix */
-(function(){const t=document.getElementById('matrix');
-  const th=H('thead',null,null,t);const g=H('tr','grp',null,th);H('th','stick','',g);H('th',null,'',g);
-  GROUPS.forEach(G=>{const c=H('th','split',G.t,g);c.colSpan=2;});
-  const r=H('tr',null,null,th);H('th','stick','Class',r);H('th','r','Members',r);
-  STATS.forEach((s,i)=>H('th','r'+(i%2===0?' split':''),s.lab.join(' '),r));
+/* matrix: one compact table, stat pairs side by side */
+(function(){const wrap=document.getElementById('matrixWrap');const tw=H('div','tbl-wrap mx',null,wrap);const t=H('table','matrix compact',null,tw);
+  const cg=H('colgroup',null,null,t);H('col','c0',null,cg);STATS.forEach(()=>H('col',null,null,cg));
+  const th=H('thead',null,null,t);const g=H('tr','grp',null,th);H('th','stick','',g);
+  GROUPS.forEach(G=>{const c=H('th',null,G.t,g);c.colSpan=2;});
+  const r=H('tr',null,null,th);H('th','stick','Class',r);
+  STATS.forEach(s=>{const c=H('th','r',null,r);c.title=s.name;s.lab.forEach(l=>H('span','hl',l,c));});
   const tb=H('tbody',null,null,t);let last=null;
-  CLS.forEach(c=>{if(c.gt!==last){last=c.gt;const gr=H('tr','gh',null,tb);H('td','stick',GT[last],gr);const td=H('td',null,'',gr);td.colSpan=STATS.length+1;}
-    const tr=H('tr',null,null,tb);const td0=H('td','stick',null,tr);const a=H('a',null,c.name,td0);a.href='#'+c.slug;
-    H('td','h',String(c.members.length),tr);
-    STATS.forEach((s,i)=>{const x=c.st[s.k];const sp=i%2===0?' split':'';
-      if(!uses(c,s.k)){const td=H('td','h na'+sp,x.n?fmt(x.med,UNIT[s.k]):'–',tr);td.title=`${s.name} is not read for ${c.name}`;return;}
-      const td=H('td','h'+sp+(x.n?' b'+bin(x.pm):'')+(LEADK[bk(s.k,c)].includes(c.k)?' lead':''),x.n?fmt(x.med,UNIT[s.k]):'–',tr);
+  CLS.forEach(c=>{if(c.gt!==last){last=c.gt;const gr=H('tr','gh',null,tb);const td=H('td',null,GT[last],gr);td.colSpan=STATS.length+1;}
+    const tr=H('tr',null,null,tb);const td0=H('td','stick',null,tr);const a=H('a',null,c.name,td0);a.href='#'+c.slug;H('span','cn',String(c.members.length),td0);
+    STATS.forEach(s=>{const x=c.st[s.k];
+      if(!uses(c,s.k)){const td=H('td','h na',x.n?fmt(x.med,UNIT[s.k]):'–',tr);td.title=`${s.name} is not read for ${c.name}`;return;}
+      const td=H('td','h'+(x.n?' b'+bin(x.pm):'')+(LEADK[bk(s.k,c)].includes(c.k)?' lead':''),x.n?fmt(x.med,UNIT[s.k]):'–',tr);
       td.title=x.n?`${c.name} · ${s.name}: median ${fmt(x.med,UNIT[s.k])} (${pctLab(bk(s.k,c))} ${Math.round(x.pm)})${x.n<c.members.length?` · ${x.n} of ${c.members.length} with data`:''}`:'No data';});});
 })();
 
@@ -481,8 +496,8 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
       const nd=c.members.filter(mm=>mm[s.k]==null).map(mm=>mm.c);if(nd.length)H('div','nod',`No data: ${list(nd)}`,cd);
     });
     const det=H('details','mem',null,sec);const su=H('summary',null,'Every member',det);H('span',null,`${c.members.length} ${c.members.length===1?'member':'members'} · bold = above the baseline median`,su);
-    const tw=H('div','tbl-wrap mtab',null,det);const t=H('table',null,null,tw);const hr=H('tr',null,null,H('thead',null,null,t));
-    H('th','stick','Character',hr);H('th','r','Power',hr);c.stats.forEach(s=>H('th','r',s.lab.join(' '),hr));
+    const tw=H('div','tbl-wrap mtab',null,det);const t=H('table','compact',null,tw);const hr=H('tr',null,null,H('thead',null,null,t));
+    H('th','stick','Character',hr);H('th','r','Power',hr);c.stats.forEach(s=>{const h=H('th','r',null,hr);h.title=s.name;s.lab.forEach(l=>H('span','hl',l,h));});
     const tb=H('tbody',null,null,t);
     c.members.slice().sort((p,q)=>(q.p||0)-(p.p||0)).forEach(mm=>{const tr=H('tr',null,null,tb);const td=H('td','stick',null,tr);td.appendChild(document.createTextNode(mm.c));const ac=ageChip(mm);if(ac)td.appendChild(ac);H('span','sub',mm.d,td);
       H('td','h',fmt(mm.p),tr);c.stats.forEach(s=>{const v=mm[s.k];H('td','h'+(v!=null&&GMED[bk(s.k,c)]!=null&&v>GMED[bk(s.k,c)]?' up':''),fmt(v,UNIT[s.k]),tr);});});
