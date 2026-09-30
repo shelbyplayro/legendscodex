@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Guild stat analysis: every class on 14 PvP stats, then each class broken out stat by stat.">
-<title>Guild Roster Board</title>
+<meta name="description" content="LEGENDS Codex: stat analysis for the LEGENDS guild, Prontera 1, Ragnarok Origin Classic.">
+<title>LEGENDS Codex</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@300;400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500&display=swap">
@@ -220,7 +220,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 <div class="wrap" id="top">
   <header style="display:grid;gap:10px">
     <div class="eyebrow" id="eyebrow"></div>
-    <h1>Guild Roster Board</h1>
+    <h1>LEGENDS Codex</h1>
     <p class="lede">Part I is the overview of every class on every stat. Part II goes class by class and sets out each stat on its own card. Physical attack classes are read on Ignore P.DEF and P.DMG Bonus, magic attack classes on Ignore M.DEF and M.DMG Bonus. Attack stats are measured against attackers only; defence stats against the whole guild. Defence/support classes also show Ignore P.DEF, measured against other defence/support characters.</p>
   </header>
   <section class="databar" aria-label="Data source">
@@ -334,7 +334,7 @@ const LEAD=LEADK,LOW=LOWK;
 const cname=k=>CLS.find(c=>c.k===k).name;
 
 /* header */
-document.getElementById('eyebrow').textContent=`Guild stat data · File dated ${D.asOf} · ${D.count} characters`;
+document.getElementById('eyebrow').textContent=`LEGENDS · Prontera 1 · Ragnarok Origin Classic · data as of ${D.asOf}`;
 
 /* findings, computed from the data */
 (function(){const F=document.getElementById('findings');const add=(b,s)=>{const li=H('li',null,null,F);H('b',null,b,li);H('span',null,s,li);};
