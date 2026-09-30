@@ -221,7 +221,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
   <header style="display:grid;gap:10px">
     <div class="eyebrow" id="eyebrow"></div>
     <h1>Guild Roster Board</h1>
-    <p class="lede">Part I is the overview of every class on every stat. Part II goes class by class and sets out each stat on its own card. Physical attack classes are read on Ignore P.DEF and P.DMG Bonus, magic attack classes on Ignore M.DEF and M.DMG Bonus. Attack stats are measured against attackers only; defence stats against the whole guild.</p>
+    <p class="lede">Part I is the overview of every class on every stat. Part II goes class by class and sets out each stat on its own card. Physical attack classes are read on Ignore P.DEF and P.DMG Bonus, magic attack classes on Ignore M.DEF and M.DMG Bonus. Attack stats are measured against attackers only; defence stats against the whole guild. Defence/support classes also show Ignore P.DEF, measured against other defence/support characters.</p>
   </header>
   <section class="databar" aria-label="Data source">
     <div class="ds"><span class="dl">Data</span><span id="dsText"></span></div>
@@ -241,7 +241,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
   <section class="sheet" aria-labelledby="h-mx">
     <div class="sec-head">
       <div><h3 id="h-mx">Class medians</h3>
-      <p>Each cell is the class median. Shade shows where that median sits against the stat's baseline: defence stats against every character; Ignore P.DEF and P.DMG Bonus against physical attackers; Ignore M.DEF and M.DMG Bonus against magic attackers; Demi-Human DMG, Medium DMG and PVP Bonus against all attackers. A gold outline marks the class with the highest median (classes with 3 or more members). Striped cells are stats not read for that class. Click a class to jump to it.</p></div>
+      <p>Each cell is the class median. Shade shows where that median sits against the stat's baseline: defence stats against every character; Ignore P.DEF and P.DMG Bonus against physical attackers; Ignore M.DEF and M.DMG Bonus against magic attackers; Demi-Human DMG, Medium DMG and PVP Bonus against all attackers; Ignore P.DEF for defence/support classes against other defence/support characters. A gold outline marks the class with the highest median (classes with 3 or more members). Striped cells are stats not read for that class. Click a class to jump to it.</p></div>
       <div class="scale" id="scale"></div>
     </div>
     <div class="tbl-wrap"><table class="matrix" id="matrix"></table></div>
@@ -295,7 +295,7 @@ const UNIT={rp:'',rm:'',ip:'',im:'',vb:'',vr:'',dd:'%',dr:'%',md:'%',mr:'%',pb:'
 const STATS=[];GROUPS.forEach((g,gi)=>g.s.forEach(([k,name,lab,side])=>STATS.push({k,name,lab,side,g,gi})));
 const CLS=D.classes.map(c=>Object.assign({},c));
 const GT={phys:'Physical attack classes',mag:'Magic attack classes',sup:'Defence / support classes'};
-const SKIP={phys:['im','mb'],mag:['ip','pb'],sup:['ip','im','dd','md','vb','pb','mb']};
+const SKIP={phys:['im','mb'],mag:['ip','pb'],sup:['im','dd','md','vb','pb','mb']};
 const uses=(c,k)=>!SKIP[c.gt].includes(k);
 CLS.forEach(c=>{c.slug=c.name.toLowerCase().replace(/[()]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');c.members=M.filter(m=>m.b===c.k);c.stats=STATS.filter(s=>uses(c,s.k));});
 const NS='http://www.w3.org/2000/svg';
@@ -312,23 +312,25 @@ const list=a=>a.length<=1?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length
 /* baselines: attack stats count attackers only */
 const GTOF={};CLS.forEach(c=>GTOF[c.k]=c.gt);
 const isAtt=m=>GTOF[m.b]==='phys'||GTOF[m.b]==='mag';
-const POOL={ip:m=>GTOF[m.b]==='phys',pb:m=>GTOF[m.b]==='phys',im:m=>GTOF[m.b]==='mag',mb:m=>GTOF[m.b]==='mag',dd:isAtt,md:isAtt,vb:isAtt};
+const POOL={ip:m=>GTOF[m.b]==='phys',pb:m=>GTOF[m.b]==='phys',im:m=>GTOF[m.b]==='mag',mb:m=>GTOF[m.b]==='mag',dd:isAtt,md:isAtt,vb:isAtt,ip_sup:m=>GTOF[m.b]==='sup'};
+const REAL=k=>k==='ip_sup'?'ip':k;
+const bk=(k,c)=>k==='ip'&&c&&c.gt==='sup'?'ip_sup':k;
 const inPool=(k,m)=>!POOL[k]||POOL[k](m);
-const BASE={ip:'physical attackers',pb:'physical attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers'};
+const BASE={ip:'physical attackers',pb:'physical attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',ip_sup:'defence/support characters'};
 const pctLab=k=>BASE[k]?`percentile among ${BASE[k]}`:'guild percentile';
 const medLab=k=>BASE[k]?`Median of ${BASE[k]}`:'Guild median';
-const SORTED={};STATS.forEach(s=>{SORTED[s.k]=M.filter(m=>inPool(s.k,m)).map(m=>m[s.k]).filter(v=>v!=null).sort((a,b)=>a-b);});
+const SORTED={};STATS.map(s=>s.k).concat(['ip_sup']).forEach(k=>{SORTED[k]=M.filter(m=>inPool(k,m)).map(m=>m[REAL(k)]).filter(v=>v!=null).sort((a,b)=>a-b);});
 const pct=(k,v)=>{if(v==null)return null;const a=SORTED[k];if(!a.length)return null;let lo=0,eq=0;for(const x of a){if(x<v)lo++;else if(x===v)eq++;}return (lo+eq/2)/a.length*100;};
 const bin=p=>p==null?0:p<20?1:p<40?2:p<60?3:p<80?4:5;
-const GMED={};STATS.forEach(s=>GMED[s.k]=med(SORTED[s.k]));
+const GMED={};Object.keys(SORTED).forEach(k=>GMED[k]=med(SORTED[k]));
 CLS.forEach(c=>{c.st={};STATS.forEach(s=>{const has=c.members.filter(m=>m[s.k]!=null);if(!has.length){c.st[s.k]={n:0};return;}
   const vals=has.map(m=>m[s.k]);const hi=Math.max(...vals),lo=Math.min(...vals),md=med(vals);
-  c.st[s.k]={n:has.length,hi,lo,med:md,leaders:has.filter(m=>m[s.k]===hi),lows:has.filter(m=>m[s.k]===lo),has,pm:pct(s.k,md),ph:pct(s.k,hi)};});
+  c.st[s.k]={n:has.length,hi,lo,med:md,leaders:has.filter(m=>m[s.k]===hi),lows:has.filter(m=>m[s.k]===lo),has,pm:pct(bk(s.k,c),md),ph:pct(bk(s.k,c),hi)};});
   c.power=med(c.members.map(m=>m.p).filter(v=>v!=null));});
-const elig=k=>CLS.filter(c=>c.members.length>=3&&uses(c,k)&&c.st[k].n);
-const LEAD={},LOW={};STATS.forEach(s=>{const el=elig(s.k);if(!el.length){LEAD[s.k]=[];LOW[s.k]=[];return;}
-  const top=Math.max(...el.map(c=>c.st[s.k].med)),bot=Math.min(...el.map(c=>c.st[s.k].med));
-  LEAD[s.k]=el.filter(c=>Math.abs(c.st[s.k].med-top)<1e-9).map(c=>c.k);LOW[s.k]=el.filter(c=>Math.abs(c.st[s.k].med-bot)<1e-9).map(c=>c.k);});
+const LEADK={},LOWK={};Object.keys(SORTED).forEach(key=>{const k=REAL(key);const el=CLS.filter(c=>c.members.length>=3&&uses(c,k)&&bk(k,c)===key&&c.st[k].n);
+  if(!el.length){LEADK[key]=[];LOWK[key]=[];return;}const top=Math.max(...el.map(c=>c.st[k].med)),bot=Math.min(...el.map(c=>c.st[k].med));
+  LEADK[key]=el.filter(c=>Math.abs(c.st[k].med-top)<1e-9).map(c=>c.k);LOWK[key]=el.filter(c=>Math.abs(c.st[k].med-bot)<1e-9).map(c=>c.k);});
+const LEAD=LEADK,LOW=LOWK;
 const cname=k=>CLS.find(c=>c.k===k).name;
 
 /* header */
@@ -343,7 +345,7 @@ document.getElementById('eyebrow').textContent=`Guild stat data · File dated ${
   const by=new Map();STATS.filter(s=>s.side==='Attack').forEach(s=>LEAD[s.k].forEach(k=>{if(!by.has(k))by.set(k,[]);by.get(k).push(s.name);}));
   const dl=[...new Set(STATS.filter(s=>s.side==='Defence').flatMap(s=>LEAD[s.k]))].map(cname);
   if(by.size)add('Class leaders by stat',`Among classes with 3 or more members: ${[...by].map(([k,a])=>`${cname(k)} leads ${list(a)}`).join('; ')}. Defence stats are led by ${list(dl)}.`);
-  const lows=CLS.filter(c=>c.members.length>=3).map(c=>({c,d:STATS.filter(s=>s.side==='Defence'&&LOW[s.k].includes(c.k)).map(s=>s.name),a:STATS.filter(s=>s.side==='Attack'&&LEAD[s.k].includes(c.k)).map(s=>s.name)})).sort((x,y)=>y.d.length-x.d.length)[0];
+  const lows=CLS.filter(c=>c.members.length>=3).map(c=>({c,d:STATS.filter(s=>s.side==='Defence'&&LOW[s.k].includes(c.k)).map(s=>s.name),a:STATS.filter(s=>s.side==='Attack'&&uses(c,s.k)&&bk(s.k,c)===s.k&&LEAD[s.k].includes(c.k)).map(s=>s.name)})).sort((x,y)=>y.d.length-x.d.length)[0];
   if(lows&&lows.d.length>=2)add(lows.a.length?`${lows.c.name} is the most one-sided class`:`${lows.c.name} is the thinnest on defence`,`${lows.a.length?`It leads ${list(lows.a)}, and h`:'H'}as the lowest median of any class with 3 or more members on ${num(lows.d.length)} defence stats: ${list(lows.d)}.`);
 })();
 
@@ -396,8 +398,8 @@ const tickFmt=(v,u,step)=>u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.r
     H('td','h',String(c.members.length),tr);
     STATS.forEach((s,i)=>{const x=c.st[s.k];const sp=i%2===0?' split':'';
       if(!uses(c,s.k)){const td=H('td','h na'+sp,x.n?fmt(x.med,UNIT[s.k]):'–',tr);td.title=`${s.name} is not read for ${c.name}`;return;}
-      const td=H('td','h'+sp+(x.n?' b'+bin(x.pm):'')+(LEAD[s.k].includes(c.k)?' lead':''),x.n?fmt(x.med,UNIT[s.k]):'–',tr);
-      td.title=x.n?`${c.name} · ${s.name}: median ${fmt(x.med,UNIT[s.k])} (${pctLab(s.k)} ${Math.round(x.pm)})${x.n<c.members.length?` · ${x.n} of ${c.members.length} with data`:''}`:'No data';});});
+      const td=H('td','h'+sp+(x.n?' b'+bin(x.pm):'')+(LEADK[bk(s.k,c)].includes(c.k)?' lead':''),x.n?fmt(x.med,UNIT[s.k]):'–',tr);
+      td.title=x.n?`${c.name} · ${s.name}: median ${fmt(x.med,UNIT[s.k])} (${pctLab(bk(s.k,c))} ${Math.round(x.pm)})${x.n<c.members.length?` · ${x.n} of ${c.members.length} with data`:''}`:'No data';});});
 })();
 
 /* Part I line charts */
@@ -410,7 +412,7 @@ const tickFmt=(v,u,step)=>u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.r
   document.getElementById('codes').textContent='Class codes: '+CLS.map(c=>`${c.ab} ${c.name}`).join(' · ');})();
 const multiBoxes=[];
 (function(){const box=document.getElementById('multi');STATS.forEach(s=>{const d=H('div','mc',null,box);const mt=H('div','mt',null,d);const h=H('h4',null,s.name,mt);H('small',null,s.side,h);
-  const lead=LEAD[s.k].map(cname).join(', ');H('span',null,`${lead?`Highest median: ${lead}`:''}${BASE[s.k]?` · baseline: ${BASE[s.k]}`:''}`,mt);const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
+  const lead=LEAD[s.k].map(cname).join(', ');H('span',null,`${lead?`Highest median: ${lead}`:''}${BASE[s.k]?` · baseline: ${BASE[s.k]}${s.k==='ip'?'; defence/support classes against each other':''}`:''}`,mt);const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
 function drawMulti(cb,s){
   cb.textContent='';const W=Math.max(280,cb.clientWidth),narrow=W<460;const u=UNIT[s.k];
   const m={l:narrow?40:48,r:8,t:12,b:narrow?40:26};const Hh=narrow?210:210;
@@ -423,7 +425,9 @@ function drawMulti(cb,s){
   if(mi>=0)S('rect',{x:m.l+step*mi,y:m.t,width:step*((si>=0?si:CLS.length)-mi),height:ph,style:'fill:var(--band)'},svg);
   nt.ticks.forEach(v=>{S('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),style:'stroke:var(--line);stroke-width:1'},svg);
     const t=S('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end','font-size':10.5,style:'fill:var(--muted)'},svg);t.textContent=tickFmt(v,u,nt.step);});
-  if(GMED[s.k]!=null)S('line',{x1:m.l,x2:W-m.r,y1:Y(GMED[s.k]),y2:Y(GMED[s.k]),style:'stroke:var(--base);stroke-width:1.2'},svg);
+  const bks=[...new Set(CLS.filter(c=>uses(c,s.k)).map(c=>bk(s.k,c)))];
+  bks.forEach(key=>{const ix=CLS.map((c,i)=>uses(c,s.k)&&bk(s.k,c)===key?i:-1).filter(i=>i>=0);if(GMED[key]==null||!ix.length)return;
+    const x1=bks.length>1?m.l+step*ix[0]:m.l,x2=bks.length>1?m.l+step*(ix[ix.length-1]+1):W-m.r;S('line',{x1,x2,y1:Y(GMED[key]),y2:Y(GMED[key]),style:'stroke:var(--base);stroke-width:1.2'},svg);});
   CLS.forEach((c,i)=>{if(narrow){const x=X(i),y=m.t+ph+10;const t=S('text',{x,y,'text-anchor':'end','font-size':10,transform:`rotate(-55 ${x} ${y})`,style:'fill:var(--ink-2)'},svg);t.textContent=c.ab;}
     else{const t=S('text',{x:X(i),y:m.t+ph+17,'text-anchor':'middle','font-size':10.5,style:'fill:var(--ink-2)'},svg);t.textContent=c.ab;}});
   const ok=c=>uses(c,s.k)&&c.st[s.k].n;const xs=CLS.map((c,i)=>X(i));
@@ -434,7 +438,7 @@ function drawMulti(cb,s){
     const c=CLS[i],x=c.st[s.k];cross.setAttribute('x1',X(i));cross.setAttribute('x2',X(i));cross.style.display='';
     tip.textContent='';H('div','tv',c.name,tip);H('div','nm',s.name,tip);
     if(!uses(c,s.k))H('div','nm','Not read for this class',tip);else if(!x.n)H('div','nm','No data',tip);
-    else{tipRow('var(--sapphire)','Highest',fmt(x.hi,u),x.leaders.map(z=>z.c).join(', '));tipRow('var(--gold)','Median',fmt(x.med,u));tipRow('var(--base)',medLab(s.k),fmt(GMED[s.k],u));H('div','nm',`${x.n} ${x.n===1?'member':'members'} with data`,tip);}
+    else{tipRow('var(--sapphire)','Highest',fmt(x.hi,u),x.leaders.map(z=>z.c).join(', '));tipRow('var(--gold)','Median',fmt(x.med,u));tipRow('var(--base)',medLab(bk(s.k,c)),fmt(GMED[bk(s.k,c)],u));H('div','nm',`${x.n} ${x.n===1?'member':'members'} with data`,tip);}
     tip.hidden=false;moveTip(e);});
   ov.addEventListener('pointerleave',()=>{cross.style.display='none';tip.hidden=true;});
 }
@@ -444,20 +448,20 @@ const box=document.getElementById('classes');const memberCharts=[];
 const rankIn=(k,v)=>{let g=0;for(const x of SORTED[k])if(x>v)g++;return g+1;};
 const staleDot=m=>{if(m.age<=14)return null;const d=H('span','sd'+(m.age>30?' old':''),null);d.title=`Data ${Math.floor(m.age)} days old`;return d;};
 function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','tv',mm.c,tip);H('div','nm',`${mm.d} · ${c.name}`,tip);
-  tipRow(null,s.name,fmt(mm[s.k],u));tipRow(null,'Rank in class',`${i+1} of ${n}`);tipRow(null,BASE[s.k]?`Rank among ${BASE[s.k]}`:'Rank in the guild',`${rankIn(s.k,mm[s.k])} of ${SORTED[s.k].length}`);
+  tipRow(null,s.name,fmt(mm[s.k],u));tipRow(null,'Rank in class',`${i+1} of ${n}`);const kb=bk(s.k,c);tipRow(null,BASE[kb]?`Rank among ${BASE[kb]}`:'Rank in the guild',`${rankIn(kb,mm[s.k])} of ${SORTED[kb].length}`);
   if(mm.age>14)H('div','nm',`Data ${Math.floor(mm.age)} days old`,tip);tip.hidden=false;moveTip(e);}
 ['phys','mag','sup'].forEach(g=>{
   const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;
-  const gt=H('div','gtitle',null,box);H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${g==='sup'?'7 defence stats':'12 stats'}`,gt);
+  const gt=H('div','gtitle',null,box);H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${g==='sup'?'8 stats: the 7 defence stats and Ignore P.DEF':'12 stats'}`,gt);
   cl.forEach(c=>{
     const sec=H('section','sheet cls',null,box);sec.id=c.slug;
     const ch=H('div','ch',null,sec);H('h3',null,c.name,ch);H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''}`,ch);
     const wd=c.stats.filter(s=>c.st[s.k].n);
-    const above=wd.filter(s=>c.st[s.k].med>GMED[s.k]).map(s=>s.name),below=wd.filter(s=>c.st[s.k].med<GMED[s.k]).map(s=>s.name);
+    const above=wd.filter(s=>c.st[s.k].med>GMED[bk(s.k,c)]).map(s=>s.name),below=wd.filter(s=>c.st[s.k].med<GMED[bk(s.k,c)]).map(s=>s.name);
     const sum=H('p','sum',null,sec);const tx=s=>sum.appendChild(document.createTextNode(s));
-    if(wd.length){H('b',null,`Class median above the baseline median on ${num(above.length)} of ${wd.length} stats${above.length?': ':'.'}`,sum);if(above.length)tx(list(above)+'. ');
+    if(wd.length){H('b',null,`Class median above the baseline median on ${above.length} of ${wd.length} stats${above.length?': ':'.'}`,sum);if(above.length)tx(list(above)+'. ');
       if(below.length){H('b',null,'Below: ',sum);tx(list(below)+'. ');}
-      const leads=c.stats.filter(s=>LEAD[s.k].includes(c.k)).map(s=>s.name+(LEAD[s.k].length>1?' (tied)':''));
+      const leads=c.stats.filter(s=>LEADK[bk(s.k,c)].includes(c.k)).map(s=>s.name+(bk(s.k,c)==='ip_sup'?' (among defence/support classes)':'')+(LEADK[bk(s.k,c)].length>1?' (tied)':''));
       if(leads.length){H('b',null,'Highest class median in the guild for: ',sum);tx(list(leads)+'.');}
       if(c.members.length<3)tx(` With ${c.members.length} ${c.members.length===1?'member':'members'}, this describes individual characters rather than a class trend.`);
       const miss=c.stats.filter(s=>!c.st[s.k].n).map(s=>s.name);if(miss.length)tx(` No data for ${list(miss)}.`);}
@@ -472,7 +476,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
     c.stats.forEach(s=>{const x=c.st[s.k],u=UNIT[s.k];const cd=H('article','card',null,cards);
       const ct=H('div','ct',null,cd);H('b',null,s.name,ct);H('span',null,s.side,ct);
       if(!x.n){H('div','nod','No data for this class',cd);return;}
-      const cv=H('div','cv',null,cd);H('strong',null,fmt(x.med,u),cv);H('span',null,`class median · ${BASE[s.k]?`median of ${BASE[s.k]}`:'guild median'} ${fmt(GMED[s.k],u)}`,cv);
+      const cv=H('div','cv',null,cd);H('strong',null,fmt(x.med,u),cv);const kb=bk(s.k,c);H('span',null,`class median · ${BASE[kb]?`median of ${BASE[kb]}`:'guild median'} ${fmt(GMED[kb],u)}`,cv);
       const cb=H('div','chart mchart',null,cd);memberCharts.push({cb,c,s});
       const nd=c.members.filter(mm=>mm[s.k]==null).map(mm=>mm.c);if(nd.length)H('div','nod',`No data: ${list(nd)}`,cd);
     });
@@ -481,9 +485,9 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
     H('th','stick','Character',hr);H('th','r','Power',hr);c.stats.forEach(s=>H('th','r',s.lab.join(' '),hr));
     const tb=H('tbody',null,null,t);
     c.members.slice().sort((p,q)=>(q.p||0)-(p.p||0)).forEach(mm=>{const tr=H('tr',null,null,tb);const td=H('td','stick',null,tr);td.appendChild(document.createTextNode(mm.c));const ac=ageChip(mm);if(ac)td.appendChild(ac);H('span','sub',mm.d,td);
-      H('td','h',fmt(mm.p),tr);c.stats.forEach(s=>{const v=mm[s.k];H('td','h'+(v!=null&&GMED[s.k]!=null&&v>GMED[s.k]?' up':''),fmt(v,UNIT[s.k]),tr);});});
+      H('td','h',fmt(mm.p),tr);c.stats.forEach(s=>{const v=mm[s.k];H('td','h'+(v!=null&&GMED[bk(s.k,c)]!=null&&v>GMED[bk(s.k,c)]?' up':''),fmt(v,UNIT[s.k]),tr);});});
     const mr=H('tr','medrow',null,tb);H('td','stick','Class median',mr);H('td','h',fmt(c.power),mr);c.stats.forEach(s=>H('td','h',fmt(c.st[s.k].med,UNIT[s.k]),mr));
-    const br=H('tr','medrow',null,tb);H('td','stick','Baseline median',br);H('td','h','',br);c.stats.forEach(s=>H('td','h muted',fmt(GMED[s.k],UNIT[s.k]),br));
+    const br=H('tr','medrow',null,tb);H('td','stick','Baseline median',br);H('td','h','',br);c.stats.forEach(s=>H('td','h muted',fmt(GMED[bk(s.k,c)],UNIT[s.k]),br));
     const tl=H('a','top-link','Back to the overview',H('div',null,null,sec));tl.href='#top';
   });
 });
@@ -494,7 +498,7 @@ function drawMember(cb,c,s){
   const spacing=(W-60)/Math.max(n,1);const rot=rows.some(r=>r.c.length*6.2>spacing-6);
   const m={l:48,r:84,t:14,b:rot?Math.min(78,18+Math.max(...rows.map(r=>Math.min(r.c.length,14)))*5.2):26};const Hh=200+m.b;
   const svg=S('svg',{viewBox:`0 0 ${W} ${Hh}`,role:'img','aria-label':`${s.name}: ${c.name} members from highest to lowest, with class and baseline medians`},cb);
-  const A=SORTED[s.k];const vals=rows.map(r=>r[s.k]).concat([A[0],A[A.length-1]]);
+  const kb=bk(s.k,c);const A=SORTED[kb];const vals=rows.map(r=>r[s.k]).concat([A[0],A[A.length-1]]);
   const lo=Math.min(...vals),hi=Math.max(...vals);const nt=niceTicks(Math.max(0,lo-(hi-lo)*0.06),hi+(hi-lo)*0.08,4);
   const y0=nt.ticks[0],y1=nt.ticks[nt.ticks.length-1];const pw=W-m.l-m.r,ph=Hh-m.t-m.b;
   const X=i=>m.l+pw*(n===1?0.5:(0.04+0.92*i/(n-1))),Y=v=>m.t+ph-(v-y0)/(y1-y0)*ph;
@@ -503,12 +507,12 @@ function drawMember(cb,c,s){
   nt.ticks.forEach(v=>{S('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),style:'stroke:var(--line);stroke-width:1'},svg);
     const tt=S('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end','font-size':10.5,style:'fill:var(--muted)'},svg);tt.textContent=tickFmt(v,u,nt.step);});
   const hl=(v,col,w)=>S('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),style:`stroke:${col};stroke-width:${w}`},svg);
-  hl(GMED[s.k],'var(--base)',1.4);hl(x.med,'var(--gold)',1.8);
-  let gy=Y(GMED[s.k])+4,cy=Y(x.med)+4;if(Math.abs(gy-cy)<24){const mid=(gy+cy)/2;if(gy<=cy){gy=mid-12;cy=mid+12;}else{gy=mid+12;cy=mid-12;}}
+  hl(GMED[kb],'var(--base)',1.4);hl(x.med,'var(--gold)',1.8);
+  let gy=Y(GMED[kb])+4,cy=Y(x.med)+4;if(Math.abs(gy-cy)<24){const mid=(gy+cy)/2;if(gy<=cy){gy=mid-12;cy=mid+12;}else{gy=mid+12;cy=mid-12;}}
   const gl=(y,top,val,col)=>{const g=S('text',{x:W-m.r+8,y,'font-size':10.5,style:'fill:var(--muted)'},svg);g.textContent=top;
     const v2=S('text',{x:W-m.r+8,y:y+11,'font-size':11,'font-weight':600,style:`fill:var(--ink)`},svg);v2.textContent=val;
     S('line',{x1:W-m.r+2,x2:W-m.r+6,y1:y-3,y2:y-3,style:`stroke:${col};stroke-width:2`},svg);};
-  gl(gy-4,'baseline',fmt(GMED[s.k],u),'var(--base)');gl(cy-4,'class',fmt(x.med,u),'var(--gold)');
+  gl(gy-4,'baseline',fmt(GMED[kb],u),'var(--base)');gl(cy-4,'class',fmt(x.med,u),'var(--gold)');
   const pts=rows.map((r,i)=>[X(i),Y(r[s.k])]);
   if(n>1)S('path',{d:curve(pts),style:'fill:none;stroke:var(--sapphire);stroke-width:2;stroke-linecap:round;stroke-linejoin:round'},svg);
   rows.forEach((r,i)=>{const st=r.age>14;S('circle',{cx:pts[i][0],cy:pts[i][1],r:i===0?4.6:3.8,style:st?'fill:var(--surface);stroke:var(--sapphire);stroke-width:2':'fill:var(--sapphire);stroke:var(--surface);stroke-width:2'},svg);});
@@ -537,8 +541,8 @@ current.copyText=copyText;
 
 /* footnote */
 (function(){const f=document.getElementById('foot');
-  H('p',null,'Physical attack classes and magic attack classes are read on 12 stats: Ignore M.DEF and M.DMG Bonus are left out for physical classes, Ignore P.DEF and P.DMG Bonus for magic classes. Defence/support classes are read on the 7 defence stats. Summoner is split by build (physical, magic, support) from its P.ATK and M.ATK because the builds carry very different stats.',f);
-  H('p',null,'Baselines: attack stats use attackers only (physical attackers for Ignore P.DEF and P.DMG Bonus, magic attackers for Ignore M.DEF and M.DMG Bonus, all attackers for Demi-Human DMG, Medium DMG and PVP Bonus), because defence characters do not build them. Defence stats use every character. Percentile = the share of the baseline with a lower value. raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); raw M.DEF uses M.DEF and Equipment M.DEF% the same way. DMG Bonus and DMG Reduction are the % values.',f);
+  H('p',null,'Physical attack classes and magic attack classes are read on 12 stats: Ignore M.DEF and M.DMG Bonus are left out for physical classes, Ignore P.DEF and P.DMG Bonus for magic classes. Defence/support classes are read on the 7 defence stats plus Ignore P.DEF. Summoner is split by build (physical, magic, support) from its P.ATK and M.ATK because the builds carry very different stats.',f);
+  H('p',null,'Baselines: attack stats use attackers only (physical attackers for Ignore P.DEF and P.DMG Bonus, magic attackers for Ignore M.DEF and M.DMG Bonus, all attackers for Demi-Human DMG, Medium DMG and PVP Bonus), because defence characters do not build them to the same level. Ignore P.DEF for defence/support classes is compared only with other defence/support characters. Defence stats use every character. Percentile = the share of the baseline with a lower value. raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); raw M.DEF uses M.DEF and Equipment M.DEF% the same way. DMG Bonus and DMG Reduction are the % values.',f);
   if(D.notes&&D.notes.length)H('p',null,'Clearly misread values are left out: '+list(D.notes)+'.',f);})();
 }
 
