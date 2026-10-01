@@ -119,13 +119,18 @@ h4{font-size:19px;font-weight:600}
 .pc-id h1{font-size:clamp(44px,6.4vw,72px)}
 .pc-id .meta{color:var(--muted);font-size:13.5px;letter-spacing:.02em}
 .pc-head .eyebrow a{color:inherit;text-decoration:none}.pc-head .eyebrow a:hover{color:var(--ink)}
-.ovrs{display:flex;gap:12px;flex-wrap:wrap}
-.ovr{display:grid;gap:8px;min-width:150px;padding:14px 18px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
-.ovr>span{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:500}
-.ovr .on{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
-.ovr strong{font-family:var(--f-display);font-size:46px;font-weight:500;line-height:.9;font-variant-numeric:lining-nums tabular-nums}
-.ovr small{font-size:12px;color:var(--muted)}
-.obar{display:block;height:4px;border-radius:999px;background:var(--line);overflow:hidden}.obar b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--sapphire),var(--gold))}
+.cpw{display:grid;gap:12px;min-width:290px;padding:15px 20px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.cpt{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.cpt span{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.cpt em{font-style:normal;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cpv{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.cpv strong{font-family:var(--f-display);font-size:44px;font-weight:500;line-height:.9;font-variant-numeric:lining-nums tabular-nums}
+.cpd{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2)}
+.cpd.up{color:var(--sapphire);border-color:color-mix(in srgb,var(--sapphire) 45%,transparent)}
+.cpd.dn{color:var(--gold-text);border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
+.cpc{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-top:11px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-2)}
+.cpc .k{display:inline-flex;align-items:center;gap:8px;min-width:0}.cpc .k span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpc b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 .cmpbar{display:grid;gap:12px;padding:16px 20px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
 .cmp-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .cmpbar .cl{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:500}
@@ -162,7 +167,7 @@ h4{font-size:19px;font-weight:600}
 .arow .av.win .rb{box-shadow:0 0 0 1.5px var(--gold)}
 .arow .rk{font-size:11.5px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .asum{margin:16px 0 0;font-size:13px;color:var(--ink-2)}
-@media (max-width:560px){.arow{grid-template-columns:minmax(0,1fr) auto auto}.arow .rk,.arow.ahead span:last-child{display:none}.arow .vv{display:none}.ovrs{width:100%}.ovr{min-width:0;flex:1}.ovr strong{font-size:40px}.pc-id h1{font-size:44px}}
+@media (max-width:560px){.arow{grid-template-columns:minmax(0,1fr) auto auto}.arow .rk,.arow.ahead span:last-child{display:none}.arow .vv{display:none}.pc-id h1{font-size:44px}.cpw{min-width:0;width:100%}}
 a.plink{color:inherit;text-decoration:none;border-bottom:1px solid var(--axis)}a.plink:hover{border-bottom-color:var(--gold)}
 .totop button{font:inherit;font-size:12.5px;letter-spacing:.04em;color:var(--ink-2);background:var(--surface);border:1px solid var(--axis);border-radius:999px;padding:8px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,color .2s}
 .totop button:hover{border-color:var(--gold);color:var(--ink)}
@@ -529,7 +534,7 @@ const UNIT={pa:'',ma:'',rp:'',rm:'',ip:'',im:'',vb:'',vr:'',dd:'%',dr:'%',md:'%'
 const SHORT={pa:'P.ATK',ma:'M.ATK',rp:'Raw P.DEF',rm:'Raw M.DEF',ip:'Ignore P.DEF',im:'Ignore M.DEF',dd:'Demi-Human',dr:'Demi-Human',md:'Medium',mr:'Medium',vb:'PVP',vr:'PVP',pb:'P.DMG',mb:'M.DMG',pr:'P.DMG',mdr:'M.DMG'};
 const STATS=[];GROUPS.forEach((g,gi)=>g.s.forEach(([k,name,lab,side])=>STATS.push({k,name,lab,side,g,gi,short:SHORT[k]})));
 const CLS=D.classes.map(c=>Object.assign({},c));
-const GT={phys:'Physical attack classes',mag:'Magic attack classes',sup:'Defence/support classes'};
+const GT={phys:'Physical attack classes',mag:'Magic attack classes',sup:'Support classes'};
 const SKIP={phys:['ma','im','mb'],mag:['pa','ip','pb'],sup:['im','dd','md','vb','pb','mb']};
 const CSKIP={'Gypsy':['ma'],'Minstrel':['ma'],'Paladin':['ma'],'High Priest':['pa'],'Biochemist':['pa'],'Summoner-support':['pa']};
 const uses=(c,k)=>!SKIP[c.gt].includes(k)&&!(CSKIP[c.k]||[]).includes(k);
@@ -555,7 +560,7 @@ const SUPK=['pa','ma','ip'];
 const REAL=k=>k.replace(/_sup$/,'');
 const bk=(k,c)=>SUPK.includes(k)&&c&&c.gt==='sup'?k+'_sup':k;
 const inPool=(k,m)=>!POOL[k]||POOL[k](m);
-const BASE={pa:'physical attackers',ip:'physical attackers',pb:'physical attackers',ma:'magic attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',pa_sup:'support classes using P.ATK',ma_sup:'support classes using M.ATK',ip_sup:'defence/support members'};
+const BASE={pa:'physical attackers',ip:'physical attackers',pb:'physical attackers',ma:'magic attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',pa_sup:'support classes using P.ATK',ma_sup:'support classes using M.ATK',ip_sup:'support members'};
 const pctLab=k=>BASE[k]?`among ${BASE[k]}`:'in the guild';
 const medLab=k=>BASE[k]?`Median of ${BASE[k]}`:'Guild median';
 const SORTED={};STATS.map(s=>s.k).concat(SUPK.map(k=>k+'_sup')).forEach(k=>{SORTED[k]=M.filter(m=>inPool(k,m)).map(m=>m[REAL(k)]).filter(v=>v!=null).sort((a,b)=>a-b);});
@@ -580,7 +585,6 @@ const pid=n=>{let h=5381;for(const ch of String(n))h=(((h<<5)+h)+ch.codePointAt(
 const PL={};M.forEach(m=>{let id=pid(m.c);while(PL[id])id+='x';m.id=id;PL[id]=m;});
 const rateOf=(k,c,v)=>v==null?null:Math.max(1,Math.min(20,Math.ceil(pct(bk(k,c),v)/5)));
 const tierOf=r=>r==null?0:r<=4?1:r<=8?2:r<=12?3:r<=16?4:5;
-const avgRate=(m,side)=>{const c=CBY[m.b];if(!c)return null;const r=c.stats.filter(s=>!side||s.side===side).map(s=>rateOf(s.k,c,m[s.k])).filter(v=>v!=null);return r.length?r.reduce((a,b)=>a+b,0)/r.length:null;};
 
 /* header */
 document.getElementById('eyebrow').textContent=`LEGENDS · Prontera 1 · Ragnarok Origin Classic · data as of ${D.asOf}`;
@@ -689,31 +693,32 @@ const multiBoxes=[];
 (function(){const box=document.getElementById('multi');STATS.forEach(s=>{const d=H('div','mc',null,box);const mt=H('div','mt',null,d);const h=H('h4',null,s.name,mt);H('small',null,s.side,h);
   const lead=list(LEAD[s.k].map(cname));H('span',null,lead?`Highest median: ${lead}`:'',mt);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
 function drawMulti(cb,s,opt){
-  cb.textContent='';const W=Math.max(280,cb.clientWidth),narrow=W<460||(W-56)/CLS.length<30;const u=UNIT[s.k];
+  cb.textContent='';const C=CLS.filter(c=>uses(c,s.k)&&c.st[s.k].n);if(!C.length)return;
+  const W=Math.max(280,cb.clientWidth),narrow=W<460||(W-56)/C.length<30;const u=UNIT[s.k];
   const m={l:narrow?40:48,r:8,t:12,b:narrow?40:26};const Hh=opt&&opt.h?opt.h:210;
   const svg=S('svg',{viewBox:`0 0 ${W} ${Hh}`,role:'img','aria-label':`${s.name}: highest and median by class`},cb);
-  const vals=CLS.filter(c=>uses(c,s.k)).flatMap(c=>c.members.map(z=>z[s.k])).filter(v=>v!=null);if(!vals.length)return;
+  const vals=C.flatMap(c=>c.members.map(z=>z[s.k])).filter(v=>v!=null);if(!vals.length)return;
   const lo=Math.min(...vals),hi=Math.max(...vals);const nt=niceTicks(Math.max(0,lo-(hi-lo)*0.06),hi+(hi-lo)*0.06,4);
-  const y0=nt.ticks[0],y1=nt.ticks[nt.ticks.length-1];const pw=W-m.l-m.r,ph=Hh-m.t-m.b,step=pw/CLS.length;
+  const y0=nt.ticks[0],y1=nt.ticks[nt.ticks.length-1];const pw=W-m.l-m.r,ph=Hh-m.t-m.b,step=pw/C.length;
   const X=i=>m.l+step*(i+0.5),Y=v=>m.t+ph-(v-y0)/(y1-y0)*ph;
-  const mi=CLS.findIndex(c=>c.gt==='mag'),si=CLS.findIndex(c=>c.gt==='sup');
-  if(mi>=0)S('rect',{x:m.l+step*mi,y:m.t,width:step*((si>=0?si:CLS.length)-mi),height:ph,style:'fill:var(--band)'},svg);
+  const mi=C.findIndex(c=>c.gt==='mag'),si=C.findIndex(c=>c.gt==='sup');
+  if(mi>=0)S('rect',{x:m.l+step*mi,y:m.t,width:step*((si>=0?si:C.length)-mi),height:ph,style:'fill:var(--band)'},svg);
+  C.forEach((c,i)=>{if(i&&c.gt!==C[i-1].gt){const x=m.l+step*i;S('line',{x1:x,x2:x,y1:m.t,y2:m.t+ph,style:'stroke:var(--axis);stroke-width:1;stroke-dasharray:2 3'},svg);}});
   nt.ticks.forEach(v=>{S('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),style:'stroke:var(--line);stroke-width:1'},svg);
     const t=S('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end','font-size':10.5,style:'fill:var(--muted)'},svg);t.textContent=tickFmt(v,u,nt.step);});
-  const bks=[...new Set(CLS.filter(c=>uses(c,s.k)).map(c=>bk(s.k,c)))];
-  bks.forEach(key=>{const ix=CLS.map((c,i)=>uses(c,s.k)&&bk(s.k,c)===key?i:-1).filter(i=>i>=0);if(GMED[key]==null||!ix.length)return;
+  const bks=[...new Set(C.map(c=>bk(s.k,c)))];
+  bks.forEach(key=>{const ix=C.map((c,i)=>bk(s.k,c)===key?i:-1).filter(i=>i>=0);if(GMED[key]==null||!ix.length)return;
     const x1=bks.length>1?m.l+step*ix[0]:m.l,x2=bks.length>1?m.l+step*(ix[ix.length-1]+1):W-m.r;S('line',{x1,x2,y1:Y(GMED[key]),y2:Y(GMED[key]),style:'stroke:var(--base);stroke-width:1.2'},svg);});
-  CLS.forEach((c,i)=>{if(narrow){const x=X(i),y=m.t+ph+10;const t=S('text',{x,y,'text-anchor':'end','font-size':10,transform:`rotate(-55 ${x} ${y})`,style:'fill:var(--ink-2)'},svg);t.textContent=c.ab;}
+  C.forEach((c,i)=>{if(narrow){const x=X(i),y=m.t+ph+10;const t=S('text',{x,y,'text-anchor':'end','font-size':10,transform:`rotate(-55 ${x} ${y})`,style:'fill:var(--ink-2)'},svg);t.textContent=c.ab;}
     else{const t=S('text',{x:X(i),y:m.t+ph+17,'text-anchor':'middle','font-size':10.5,style:'fill:var(--ink-2)'},svg);t.textContent=c.ab;}});
-  const ok=c=>uses(c,s.k)&&c.st[s.k].n;const xs=CLS.map((c,i)=>X(i));
-  drawSeries(svg,xs,CLS.map(c=>ok(c)?Y(c.st[s.k].hi):null),CLS.map(c=>ok(c)?Y(c.st[s.k].med):null),true);
+  const xs=C.map((c,i)=>X(i));
+  drawSeries(svg,xs,C.map(c=>Y(c.st[s.k].hi)),C.map(c=>Y(c.st[s.k].med)),true);
   const cross=S('line',{y1:m.t,y2:m.t+ph,style:'stroke:var(--axis);stroke-width:1;display:none'},svg);
   const ov=S('rect',{x:m.l,y:0,width:pw,height:Hh,style:'fill:transparent'},svg);
-  ov.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)*(W/r.width);const i=Math.max(0,Math.min(CLS.length-1,Math.floor((px-m.l)/step)));
-    const c=CLS[i],x=c.st[s.k];cross.setAttribute('x1',X(i));cross.setAttribute('x2',X(i));cross.style.display='';
+  ov.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)*(W/r.width);const i=Math.max(0,Math.min(C.length-1,Math.floor((px-m.l)/step)));
+    const c=C[i],x=c.st[s.k];cross.setAttribute('x1',X(i));cross.setAttribute('x2',X(i));cross.style.display='';
     tip.textContent='';H('div','tv',c.name,tip);H('div','nm',s.name,tip);
-    if(!uses(c,s.k))H('div','nm','Not used by this class',tip);else if(!x.n)H('div','nm','No data',tip);
-    else{tipRow('var(--sapphire)','Highest',fmt(x.hi,u),list(x.leaders.map(z=>z.c)));tipRow('var(--gold)','Median',fmt(x.med,u));tipRow('var(--base)',medLab(bk(s.k,c)),fmt(GMED[bk(s.k,c)],u));H('div','nm',`${x.n} ${x.n===1?'member':'members'} with data`,tip);}
+    {tipRow('var(--sapphire)','Highest',fmt(x.hi,u),list(x.leaders.map(z=>z.c)));tipRow('var(--gold)','Median',fmt(x.med,u));tipRow('var(--base)',medLab(bk(s.k,c)),fmt(GMED[bk(s.k,c)],u));H('div','nm',`${x.n} ${x.n===1?'member':'members'} with data`,tip);}
     tip.hidden=false;moveTip(e);});
   ov.addEventListener('pointerleave',()=>{cross.style.display='none';tip.hidden=true;});
 }
@@ -879,9 +884,12 @@ function renderPlayer(A,B){const box=document.getElementById('pcard');box.textCo
   const bk2=H('a','pback',null,box);bk2.href='#players';bk2.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" style="fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/></svg>';bk2.appendChild(document.createTextNode('Player Attribute'));
   const hd=H('header','pc-head',null,box);const hl=H('div','pc-id',null,hd);
   const eb=H('div','eyebrow',null,hl);const el=H('a',null,ca.name,eb);el.href='#'+ca.slug;eb.appendChild(document.createTextNode(` · ${GT[ca.gt].replace(' classes','')}`));
-  H('h1',null,A.c,hl);H('div','meta',[A.d,A.p!=null?`Power ${fmt(A.p)}`:null,A.age>14?`data ${Math.floor(A.age)} days old`:null].filter(Boolean).join(' · '),hl);
-  const ovs=H('div','ovrs',null,hd);[['Attack','Attack'],['Defence','Defence']].forEach(([sd,l])=>{const ar=avgRate(A,sd);const ov=H('div','ovr',null,ovs);H('span',null,l,ov);const n=H('div','on',null,ov);H('strong',null,ar==null?'–':ar.toFixed(1),n);H('small',null,'/ 20',n);
-    const bar=H('i','obar',null,ov);H('b',null,null,bar).style.width=(ar==null?0:ar/20*100)+'%';});
+  H('h1',null,A.c,hl);if(A.age>14)H('div','meta',`Data ${Math.floor(A.age)} days old`,hl);
+  {const pv=ca.members.map(z=>z.p).filter(v=>v!=null),oB=B?B.p:med(pv),cw=H('div','cpw',null,hd);
+    const t=H('div','cpt',null,cw);H('span',null,'Combat Power',t);if(A.p!=null&&pv.length)H('em',null,`Rank ${1+pv.filter(v=>v>A.p).length}/${pv.length} in class`,t);
+    const v=H('div','cpv',null,cw);H('strong',null,fmt(A.p),v);
+    if(A.p!=null&&oB!=null){const d=A.p-oB,pc=oB?d/oB*100:0;H('span','cpd'+(d>0?' up':d<0?' dn':''),`${d>0?'+':d<0?'−':'±'}${Math.abs(Math.round(d)).toLocaleString('en-US')}${Math.abs(pc)>=0.05?` · ${d<0?'−':'+'}${Math.abs(pc).toFixed(1)}%`:''}`,v);}
+    const c=H('div','cpc',null,cw);const k=H('span','k',null,c);k.appendChild(B?dotKey('var(--gold)',1):hKey('var(--gold)'));H('span',null,B?B.c:`${ca.name} median`,k);H('b',null,fmt(oB),c);}
   const cmp=H('section','cmpbar',null,box);const r1=H('div','cmp-row',null,cmp);H('span','cl','Compare with',r1);
   const seg=H('div','seg',null,r1);const bc=H('button',null,'Class median',seg);bc.type='button';bc.setAttribute('aria-pressed',String(!B));bc.addEventListener('click',()=>{location.hash=A.id;});
   const sw=H('label','ssel'+(B?' on':''),null,seg);H('span','ssl',B?B.c:'Another player',sw);sw.insertAdjacentHTML('beforeend','<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.6 5 6.6 8 3.6" style="fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"/></svg>');
@@ -933,8 +941,8 @@ current.copyText=copyText;
 (function(){const f=document.getElementById('foot');
   const supC=CLS.filter(c=>c.gt==='sup'),only=(a,b)=>supC.filter(c=>uses(c,a)&&!uses(c,b)).map(c=>c.name),both=supC.filter(c=>uses(c,'pa')&&uses(c,'ma')).map(c=>c.name);
   const atkTxt=[only('pa','ma').length?`P.ATK for ${list(only('pa','ma'))}`:'',only('ma','pa').length?`M.ATK for ${list(only('ma','pa'))}`:'',both.length?`both for ${list(both)}`:''].filter(Boolean).join('; ');
-  H('p',null,'Physical attack classes leave out M.ATK, Ignore M.DEF and M.DMG Bonus; magic attack classes leave out P.ATK, Ignore P.DEF and P.DMG Bonus. Defence/support classes show the 7 defence stats, Ignore P.DEF and the ATK they use'+(atkTxt?': '+atkTxt:'')+'. Summoner is split into physical, magic and support builds by comparing its P.ATK and M.ATK.',f);
-  H('p',null,'Baselines: physical attackers for P.ATK, Ignore P.DEF and P.DMG Bonus; magic attackers for M.ATK, Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; every member for defence stats. Defence/support classes are compared with each other: with all defence/support members on Ignore P.DEF, and with the support classes that use the same ATK on P.ATK and M.ATK. Percentile is the share of the baseline with a lower value. The class leader outline marks the highest value in each column, whatever the class size.',f);
+  H('p',null,'Physical attack classes leave out M.ATK, Ignore M.DEF and M.DMG Bonus; magic attack classes leave out P.ATK, Ignore P.DEF and P.DMG Bonus. Support classes show the 7 defence stats, Ignore P.DEF and the ATK they use'+(atkTxt?': '+atkTxt:'')+'. Summoner is split into physical, magic and support builds by comparing its P.ATK and M.ATK.',f);
+  H('p',null,'Baselines: physical attackers for P.ATK, Ignore P.DEF and P.DMG Bonus; magic attackers for M.ATK, Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; every member for defence stats. Support classes are compared with each other: with all support members on Ignore P.DEF, and with the support classes that use the same ATK on P.ATK and M.ATK. Percentile is the share of the baseline with a lower value. The class leader outline marks the highest value in each column, whatever the class size.',f);
   H('p',null,'Raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); Raw M.DEF uses M.DEF and Equipment M.DEF% the same way. DEF left after Ignore is Raw P.DEF minus the median Ignore P.DEF of physical attackers, and Raw M.DEF minus the median Ignore M.DEF of magic attackers; below 0 means a typical attacker ignores all of it. Data age is the oldest of the General, Advanced and Special sections, counted from the latest update in the file ('+D.ref+').',f);
   H('p',null,'Player ratings run from 1 to 20: the percentile against the stat\'s baseline in steps of 5, so 20 is the top 5%. The attack and defence ratings on a player card are the means over the attack and defence stats the class uses. The profile chart shows the same percentiles, one axis per stat.',f);
   const mis=[D.notes&&D.notes.length?'Left out as misread: '+D.notes.join('; ')+'.':'',D.zero?'Special values recorded as 0 are treated as missing.':''].filter(Boolean).join(' ');if(mis)H('p',null,mis,f);})();
