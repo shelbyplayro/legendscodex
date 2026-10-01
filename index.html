@@ -43,6 +43,27 @@ img{max-width:100%}
   --h1:#1c1d21; --h2:#2c2d31; --h3:#46464b; --h4:#8e8a80; --h5:#d9d3c6;
   --t1:#efece6; --t2:#efece6; --t3:#efece6; --t4:#111214; --t5:#111214;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.25); color-scheme:dark}
+/* the page's own Dark/Light switch (dark by default) overrides the system or host theme */
+html.t-light:root{
+  --bg:#f1f0ec; --surface:#fdfcfa; --ink:#16171a; --ink-2:#4f5157; --muted:#86878c;
+  --line:#e6e3dc; --axis:#d1cdc4; --band:#f7f6f2;
+  --gold:#b8873a; --gold-text:#83602a; --gold-wash:#f4eee2;
+  --sapphire:#34599c; --band-fill:rgba(52,89,156,.08);
+  --base:#9d9ea3; --dot:#b3b3b6; --iqr:rgba(22,23,26,.05);
+  --h1:#f4f2ed; --h2:#e4e0d6; --h3:#cbc5b7; --h4:#7b7467; --h5:#4d4942;
+  --t1:#16171a; --t2:#16171a; --t3:#16171a; --t4:#ffffff; --t5:#ffffff;
+  --warn:#fab219; --serious:#ec835a;
+  --shadow:0 1px 2px rgba(22,23,26,.04),0 8px 28px rgba(22,23,26,.05);
+  color-scheme:light}
+html.t-dark:root{
+  --bg:#0e0f11; --surface:#16171a; --ink:#efece6; --ink-2:#b8b5ae; --muted:#86858a;
+  --line:#26272b; --axis:#3a3b40; --band:#1b1c20;
+  --gold:#b98b3c; --gold-text:#d8b577; --gold-wash:#282218;
+  --sapphire:#5b80cc; --band-fill:rgba(91,128,204,.12);
+  --base:#707177; --dot:#56575d; --iqr:rgba(255,255,255,.055);
+  --h1:#1c1d21; --h2:#2c2d31; --h3:#46464b; --h4:#8e8a80; --h5:#d9d3c6;
+  --t1:#efece6; --t2:#efece6; --t3:#efece6; --t4:#111214; --t5:#111214;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.25); color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
@@ -198,6 +219,13 @@ td.up{font-weight:600;color:var(--ink)}
 .card dt{color:var(--muted)}
 .card dd{margin:0;min-width:0;overflow-wrap:break-word;font-variant-numeric:tabular-nums}
 .card .nod{color:var(--muted);font-size:13px}
+.gtwin .gl,.gmini-h{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.gsub{font-size:12px;color:var(--ink-2)}
+.gtwin{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gtwin>div{display:grid}
+.gtwin strong{font-size:30px;font-weight:300;line-height:1.15;letter-spacing:-.01em}
+.gmini-h{margin-top:8px}
+.mchart.mini{margin-top:2px}
 .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;line-height:1;padding:3px 7px;border:1px solid var(--axis);border-radius:999px;white-space:nowrap;color:var(--ink-2);margin-left:6px;vertical-align:1px}
 .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--warn)}
 .chip.old::before{background:var(--serious)}
@@ -246,6 +274,12 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 .sn-n{font-size:11px;color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
 .anchor,.cls{scroll-margin-top:24px}
 .menu-btn{display:none}
+.theme-sw{position:fixed;z-index:31;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;display:inline-flex;gap:2px;padding:3px;background:var(--surface);border:1px solid var(--axis);border-radius:999px;box-shadow:var(--shadow)}
+.theme-sw button{font:inherit;font-size:12.5px;letter-spacing:.04em;color:var(--ink-2);background:transparent;border:0;border-radius:999px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,color .15s}
+.theme-sw button:hover{color:var(--ink)}
+.theme-sw button[aria-pressed="true"]{background:var(--gold-wash);color:var(--ink);box-shadow:inset 0 0 0 1px var(--gold)}
+.theme-sw svg{flex:none}
+@media (min-width:1240px){.theme-sw{top:calc(env(safe-area-inset-top,0px) + 16px);right:16px}}
 .scrim{position:fixed;inset:0;z-index:29;background:color-mix(in srgb,var(--ink) 30%,transparent)}
 @media (min-width:1240px){#index{display:none}.scrim{display:none}}
 @media (max-width:1239px){
@@ -285,6 +319,8 @@ html.zoomed{overflow:hidden}
 </style>
 </head>
 <body>
+<script>(function(){var t='dark';try{var v=localStorage.getItem('roocstats.theme');if(v==='light'||v==='dark')t=v;}catch(e){}document.documentElement.classList.add('t-'+t);})();</script>
+<div class="theme-sw" id="themeSw" role="group" aria-label="Colour theme"><button type="button" data-t="dark" aria-pressed="true"><svg width="13" height="13" viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 12.6A6.5 6.5 0 0 1 7.4 4.5a6.5 6.5 0 1 0 8.1 8.1Z" style="fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round"/></svg>Dark</button><button type="button" data-t="light" aria-pressed="false"><svg width="13" height="13" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.6" style="fill:none;stroke:currentColor;stroke-width:1.7"/><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4M4.2 4.2l1.7 1.7M14.1 14.1l1.7 1.7M4.2 15.8l1.7-1.7M14.1 5.9l1.7-1.7" style="fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round"/></svg>Light</button></div>
 <button class="menu-btn" id="menuBtn" type="button" aria-controls="side" aria-expanded="false"><span class="mb-i" aria-hidden="true"></span>Menu</button>
 <div class="scrim" id="scrim" hidden></div>
 <div class="shell">
@@ -379,12 +415,13 @@ const STATS=[];GROUPS.forEach((g,gi)=>g.s.forEach(([k,name,lab,side])=>STATS.pus
 const CLS=D.classes.map(c=>Object.assign({},c));
 const GT={phys:'Physical attack classes',mag:'Magic attack classes',sup:'Defence / support classes'};
 const SKIP={phys:['ma','im','mb'],mag:['pa','ip','pb'],sup:['im','dd','md','vb','pb','mb']};
-const uses=(c,k)=>!SKIP[c.gt].includes(k);
+const CSKIP={'Gypsy':['ma'],'Minstrel':['ma'],'High Priest':['pa'],'Biochemist':['pa'],'Summoner-support':['pa']};
+const uses=(c,k)=>!SKIP[c.gt].includes(k)&&!(CSKIP[c.k]||[]).includes(k);
 CLS.forEach(c=>{c.slug=c.name.toLowerCase().replace(/[()]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');c.members=M.filter(m=>m.b===c.k);c.stats=STATS.filter(s=>uses(c,s.k));});
 const NS='http://www.w3.org/2000/svg';
 function S(tag,a,p){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
 function H(tag,cls,text,p){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;if(p)p.appendChild(e);return e;}
-const fmt=(v,u)=>{if(v==null)return '–';if(u==='%')return (Math.round(v*10)/10).toFixed(1)+'%';return Math.round(v).toLocaleString('en-US');};
+const fmt=(v,u)=>{if(v==null)return '–';if(u==='±'){const r=Math.round(v);return (r>0?'+':r<0?'−':'')+Math.abs(r).toLocaleString('en-US');}if(u==='%')return (Math.round(v*10)/10).toFixed(1)+'%';return Math.round(v).toLocaleString('en-US');};
 const med=a=>{const v=a.slice().sort((p,q)=>p-q);const n=v.length;if(!n)return null;return n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2;};
 const ageChip=m=>m.age<=14?null:H('span','chip '+(m.age>30?'old':'stale'),`data ${Math.floor(m.age)} d old`);
 const ord=n=>{n=Math.round(n);const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
@@ -396,19 +433,24 @@ const list=a=>a.length<=1?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length
 const GTOF={};CLS.forEach(c=>GTOF[c.k]=c.gt);
 const isAtt=m=>GTOF[m.b]==='phys'||GTOF[m.b]==='mag';
 const isPh=m=>GTOF[m.b]==='phys',isMg=m=>GTOF[m.b]==='mag',isSp=m=>GTOF[m.b]==='sup';
-const POOL={pa:isPh,ip:isPh,pb:isPh,ma:isMg,im:isMg,mb:isMg,dd:isAtt,md:isAtt,vb:isAtt,pa_sup:isSp,ma_sup:isSp,ip_sup:isSp};
+const CBY={};CLS.forEach(c=>CBY[c.k]=c);const usesB=(m,k)=>!!CBY[m.b]&&uses(CBY[m.b],k);
+const POOL={pa:isPh,ip:isPh,pb:isPh,ma:isMg,im:isMg,mb:isMg,dd:isAtt,md:isAtt,vb:isAtt,pa_sup:m=>isSp(m)&&usesB(m,'pa'),ma_sup:m=>isSp(m)&&usesB(m,'ma'),ip_sup:isSp};
 const SUPK=['pa','ma','ip'];
 const REAL=k=>k.replace(/_sup$/,'');
 const bk=(k,c)=>SUPK.includes(k)&&c&&c.gt==='sup'?k+'_sup':k;
 const inPool=(k,m)=>!POOL[k]||POOL[k](m);
-const BASE={pa:'physical attackers',ip:'physical attackers',pb:'physical attackers',ma:'magic attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',pa_sup:'defence/support characters',ma_sup:'defence/support characters',ip_sup:'defence/support characters'};
+const BASE={pa:'physical attackers',ip:'physical attackers',pb:'physical attackers',ma:'magic attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',pa_sup:'support classes using P.ATK',ma_sup:'support classes using M.ATK',ip_sup:'defence/support characters'};
 const pctLab=k=>BASE[k]?`percentile among ${BASE[k]}`:'guild percentile';
 const medLab=k=>BASE[k]?`Median of ${BASE[k]}`:'Guild median';
 const SORTED={};STATS.map(s=>s.k).concat(SUPK.map(k=>k+'_sup')).forEach(k=>{SORTED[k]=M.filter(m=>inPool(k,m)).map(m=>m[REAL(k)]).filter(v=>v!=null).sort((a,b)=>a-b);});
 const pct=(k,v)=>{if(v==null)return null;const a=SORTED[k];if(!a.length)return null;let lo=0,eq=0;for(const x of a){if(x<v)lo++;else if(x===v)eq++;}return (lo+eq/2)/a.length*100;};
 const bin=p=>p==null?0:p<20?1:p<40?2:p<60?3:p<80?4:5;
 const GMED={};Object.keys(SORTED).forEach(k=>GMED[k]=med(SORTED[k]));
-CLS.forEach(c=>{c.st={};STATS.forEach(s=>{const has=c.members.filter(m=>m[s.k]!=null);if(!has.length){c.st[s.k]={n:0};return;}
+const GAPS=[{k:'gp',src:'rp',ref:'ip',name:'DEF left after Ignore · vs physical',tab:'vs physical',side:'Defence',def:'raw P.DEF',ign:'Ignore P.DEF',pool:'physical attackers',zero:true},
+            {k:'gm',src:'rm',ref:'im',name:'DEF left after Ignore · vs magic',tab:'vs magic',side:'Defence',def:'raw M.DEF',ign:'Ignore M.DEF',pool:'magic attackers',zero:true}];
+GAPS.forEach(g=>{M.forEach(m=>{m[g.k]=m[g.src]!=null&&GMED[g.ref]!=null?m[g.src]-GMED[g.ref]:null;});UNIT[g.k]='±';
+  SORTED[g.k]=M.map(m=>m[g.k]).filter(v=>v!=null).sort((a,b)=>a-b);GMED[g.k]=med(SORTED[g.k]);});
+CLS.forEach(c=>{c.st={};STATS.concat(GAPS).forEach(s=>{const has=c.members.filter(m=>m[s.k]!=null);if(!has.length){c.st[s.k]={n:0};return;}
   const vals=has.map(m=>m[s.k]);const hi=Math.max(...vals),lo=Math.min(...vals),md=med(vals);
   c.st[s.k]={n:has.length,hi,lo,med:md,leaders:has.filter(m=>m[s.k]===hi),lows:has.filter(m=>m[s.k]===lo),has,pm:pct(bk(s.k,c),md),ph:pct(bk(s.k,c),hi)};});
   c.power=med(c.members.map(m=>m.p).filter(v=>v!=null));});
@@ -484,7 +526,7 @@ function drawSeries(svg,xs,hi,lo,showHi){
 }
 function niceTicks(lo,hi,n){const span=hi-lo||1;const s0=span/n;const mg=Math.pow(10,Math.floor(Math.log10(s0)));const f=s0/mg;const step=(f<1.5?1:f<3?2:f<7?5:10)*mg;
   const out=[];const end=Math.ceil(hi/step-1e-9)*step;for(let v=Math.floor(lo/step)*step;v<=end+step*0.001;v+=step)out.push(Math.round(v*1000)/1000);return {ticks:out,step};}
-const tickFmt=(v,u,step)=>u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.round(v).toLocaleString('en-US');
+const tickFmt=(v,u,step)=>u==='±'?(v<0?'−':'')+Math.abs(Math.round(v)).toLocaleString('en-US'):u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.round(v).toLocaleString('en-US');
 
 /* index + scale */
 (function(){const I=document.getElementById('index');['phys','mag','sup'].forEach((g,gi)=>{const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;if(I.children.length)H('span','br',null,I);H('span','ig',GT[g],I);
@@ -549,6 +591,17 @@ function drawMulti(cb,s,opt){
   ov.addEventListener('pointerleave',()=>{cross.style.display='none';tip.hidden=true;});
 }
 
+/* DEF left after Ignore: one card, two views */
+function gapCard(c,cards,lg){
+  const cd=H('article','card gapc',null,cards);
+  const ct=H('div','ct',null,cd);H('b',null,'DEF left after Ignore',ct);const ctr=H('span','ctr',null,ct);H('span',null,'Defence',ctr);
+  if(!GAPS.some(g=>c.st[g.k].n)){H('div','nod','No data for this class',cd);return;}
+    const tw=H('div','gtwin',null,cd);GAPS.forEach(g=>{const x=c.st[g.k];const d=H('div',null,null,tw);H('span','gl',g.tab,d);H('strong',null,x.n?fmt(x.med,'±'):'–',d);});
+    H('div','gsub',`class medians · raw DEF minus the median Ignore DEF of physical attackers (${fmt(GMED.ip)}) and magic attackers (${fmt(GMED.im)})`,cd);
+    GAPS.forEach(g=>{H('div','gmini-h',g.tab,cd);const pane=H('div','chart mchart mini',null,cd);if(c.st[g.k].n)memberCharts.push({cb:pane,c,s:g,opt:{h:104,noNames:true}});else H('div','nod','No data',pane);});
+    const nd=c.members.filter(mm=>GAPS.some(g=>mm[g.k]==null)).map(mm=>mm.c);if(nd.length)H('div','nod',`No data: ${list(nd)}`,cd);
+  ctr.appendChild(xbtn(`Expand DEF left after Ignore charts for ${c.name}`,b=>openZoom(b,`${c.name} · Defence stat`,'DEF left after Ignore',`Class medians ${GAPS.map(g=>`${g.tab} ${fmt(c.st[g.k].med,'±')}`).join(' · ')} · raw DEF minus the median Ignore DEF of physical attackers (${fmt(GMED.ip)}) and magic attackers (${fmt(GMED.im)})`,lg,(z,o)=>{z.textContent='';GAPS.forEach(g=>{H('div','gmini-h',g.tab,z);const d=H('div','chart',null,z);if(c.st[g.k].n)drawMember(d,c,g,{h:Math.round(o.h*0.42)});else H('div','nod','No data',d);});})));
+}
 /* Part II */
 const box=document.getElementById('classes');const memberCharts=[];
 const rankIn=(k,v)=>{let g=0;for(const x of SORTED[k])if(x>v)g++;return g+1;};
@@ -579,14 +632,15 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
     a=H('span',null,null,lg);a.appendChild(bandKey2());a.appendChild(document.createTextNode('Middle half of the baseline'));
     a=H('span',null,null,lg);a.appendChild(hollowKey());a.appendChild(document.createTextNode('Data older than 14 days'));
     const cards=H('div','cards',null,sec);
-    c.stats.forEach(s=>{const x=c.st[s.k],u=UNIT[s.k];const cd=H('article','card',null,cards);
+    let gapDone=false;c.stats.forEach(s=>{statCard(s);if(!gapDone&&(s.k==='ip'||s.k==='im')){gapCard(c,cards,lg);gapDone=true;}});if(!gapDone)gapCard(c,cards,lg);
+    function statCard(s){const x=c.st[s.k],u=UNIT[s.k];const cd=H('article','card',null,cards);
       const ct=H('div','ct',null,cd);H('b',null,s.name,ct);const ctr=H('span','ctr',null,ct);H('span',null,s.side,ctr);
       if(!x.n){H('div','nod','No data for this class',cd);return;}
       const cv=H('div','cv',null,cd);H('strong',null,fmt(x.med,u),cv);const kb=bk(s.k,c);H('span',null,`class median · ${BASE[kb]?`median of ${BASE[kb]}`:'guild median'} ${fmt(GMED[kb],u)}`,cv);
       ctr.appendChild(xbtn(`Expand ${s.name} chart for ${c.name}`,b=>openZoom(b,`${c.name} · ${s.side} stat`,s.name,`Class median ${fmt(x.med,u)} · ${BASE[kb]?`median of ${BASE[kb]}`:'guild median'} ${fmt(GMED[kb],u)}`,lg,(z,o)=>drawMember(z,c,s,o))));
       const cb=H('div','chart mchart',null,cd);memberCharts.push({cb,c,s});
       const nd=c.members.filter(mm=>mm[s.k]==null).map(mm=>mm.c);if(nd.length)H('div','nod',`No data: ${list(nd)}`,cd);
-    });
+    }
     const det=H('details','mem',null,sec);const su=H('summary',null,'Every member',det);H('span',null,`${c.members.length} ${c.members.length===1?'member':'members'} · bold = above baseline`,su);
     const tw=H('div','tbl-wrap mtab',null,det);const t=H('table','compact',null,tw);const hr=H('tr',null,null,H('thead',null,null,t));
     H('th','stick','Character',hr);H('th','r','Power',hr);c.stats.forEach(s=>{const h=H('th','r',null,hr);h.title=s.name;s.lab.forEach(l=>H('span','hl',l,h));});
@@ -600,13 +654,13 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
 });
 function quant(a,q){if(!a.length)return null;const p=(a.length-1)*q,i=Math.floor(p),f=p-i;return a[i]+(a[Math.min(i+1,a.length-1)]-a[i])*f;}
 function drawMember(cb,c,s,opt){
-  cb.textContent='';const W=Math.max(260,cb.clientWidth),u=UNIT[s.k],x=c.st[s.k];
+  if(cb.hidden)return;cb.textContent='';const W=Math.max(260,cb.clientWidth),u=UNIT[s.k],x=c.st[s.k];
   const rows=x.has.slice().sort((p,q)=>q[s.k]-p[s.k]);const n=rows.length;
-  const spacing=(W-60)/Math.max(n,1);const rot=rows.some(r=>r.c.length*6.2>spacing-6);
-  const m={l:48,r:84,t:14,b:rot?Math.min(78,18+Math.max(...rows.map(r=>Math.min(r.c.length,14)))*5.2):26};const Hh=(opt&&opt.h?opt.h:200)+m.b;
+  const spacing=(W-60)/Math.max(n,1);const noN=!!(opt&&opt.noNames);const rot=!noN&&rows.some(r=>r.c.length*6.2>spacing-6);
+  const m={l:48,r:84,t:14,b:noN?10:rot?Math.min(78,18+Math.max(...rows.map(r=>Math.min(r.c.length,14)))*5.2):26};const Hh=(opt&&opt.h?opt.h:200)+m.b;
   const svg=S('svg',{viewBox:`0 0 ${W} ${Hh}`,role:'img','aria-label':`${s.name}: ${c.name} members from highest to lowest, with class and baseline medians`},cb);
-  const kb=bk(s.k,c);const A=SORTED[kb];const vals=rows.map(r=>r[s.k]).concat([A[0],A[A.length-1]]);
-  const lo=Math.min(...vals),hi=Math.max(...vals);const nt=niceTicks(Math.max(0,lo-(hi-lo)*0.06),hi+(hi-lo)*0.08,4);
+  const kb=bk(s.k,c);const A=SORTED[kb];const vals=rows.map(r=>r[s.k]).concat(s.zero?[quant(A,0.25),quant(A,0.75),0]:[A[0],A[A.length-1]]);
+  const lo=Math.min(...vals),hi=Math.max(...vals);const nt=niceTicks(s.zero?(lo>=0?0:lo-(hi-lo)*0.06):Math.max(0,lo-(hi-lo)*0.06),hi+(hi-lo)*0.08,noN?3:4);
   const y0=nt.ticks[0],y1=nt.ticks[nt.ticks.length-1];const pw=W-m.l-m.r,ph=Hh-m.t-m.b;
   const X=i=>m.l+pw*(n===1?0.5:(0.04+0.92*i/(n-1))),Y=v=>m.t+ph-(v-y0)/(y1-y0)*ph;
   const q1=quant(A,0.25),q3=quant(A,0.75);
@@ -614,6 +668,7 @@ function drawMember(cb,c,s,opt){
   nt.ticks.forEach(v=>{S('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),style:'stroke:var(--line);stroke-width:1'},svg);
     const tt=S('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end','font-size':10.5,style:'fill:var(--muted)'},svg);tt.textContent=tickFmt(v,u,nt.step);});
   const hl=(v,col,w)=>S('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),style:`stroke:${col};stroke-width:${w}`},svg);
+  if(s.zero&&y0<0&&y1>0)S('line',{x1:m.l,x2:W-m.r,y1:Y(0),y2:Y(0),style:'stroke:var(--ink-2);stroke-width:1;stroke-dasharray:2 3'},svg);
   hl(GMED[kb],'var(--base)',1.4);hl(x.med,'var(--gold)',1.8);
   let gy=Y(GMED[kb])+4,cy=Y(x.med)+4;if(Math.abs(gy-cy)<24){const mid=(gy+cy)/2;if(gy<=cy){gy=mid-12;cy=mid+12;}else{gy=mid+12;cy=mid-12;}}
   const gl=(y,top,val,col)=>{const g=S('text',{x:W-m.r+8,y,'font-size':10.5,style:'fill:var(--muted)'},svg);g.textContent=top;
@@ -625,7 +680,7 @@ function drawMember(cb,c,s,opt){
   rows.forEach((r,i)=>{const st=r.age>14;S('circle',{cx:pts[i][0],cy:pts[i][1],r:i===0?4.6:3.8,style:st?'fill:var(--surface);stroke:var(--sapphire);stroke-width:2':'fill:var(--sapphire);stroke:var(--surface);stroke-width:2'},svg);});
   const lab=(i)=>{const ed=n>1&&i===n-1,st=n>1&&i===0;const tt=S('text',{x:pts[i][0]+(ed?5:st?-5:0),y:pts[i][1]-9,'text-anchor':ed?'end':st?'start':'middle','font-size':10.5,'font-weight':600,style:'fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px'},svg);tt.textContent=fmt(rows[i][s.k],u);};
   if(n<=6)rows.forEach((r,i)=>lab(i));else{lab(0);lab(n-1);}
-  rows.forEach((r,i)=>{const nm=r.c.length>14?r.c.slice(0,13)+'…':r.c;const xx=pts[i][0],yy=m.t+ph+14;
+  if(!noN)rows.forEach((r,i)=>{const nm=r.c.length>14?r.c.slice(0,13)+'…':r.c;const xx=pts[i][0],yy=m.t+ph+14;
     const tt=rot?S('text',{x:xx,y:yy,'text-anchor':'end','font-size':10.5,transform:`rotate(-50 ${xx} ${yy})`,style:'fill:var(--ink-2)'},svg):S('text',{x:xx,y:yy+2,'text-anchor':'middle','font-size':11,style:'fill:var(--ink-2)'},svg);tt.textContent=nm;});
   const ov=S('rect',{x:m.l,y:0,width:pw,height:Hh,style:'fill:transparent'},svg);
   const cross=S('line',{y1:m.t,y2:m.t+ph,style:'stroke:var(--axis);stroke-width:1;display:none'},svg);svg.appendChild(ov);
@@ -633,7 +688,7 @@ function drawMember(cb,c,s,opt){
     cross.setAttribute('x1',pts[bi][0]);cross.setAttribute('x2',pts[bi][0]);cross.style.display='';memberTip(e,rows[bi],c,s,bi,n);});
   ov.addEventListener('pointerleave',()=>{cross.style.display='none';tip.hidden=true;});
 }
-const drawAll=()=>{multiBoxes.forEach(({cb,s})=>drawMulti(cb,s));memberCharts.forEach(({cb,c,s})=>drawMember(cb,c,s));};
+const drawAll=()=>{multiBoxes.forEach(({cb,s})=>drawMulti(cb,s));memberCharts.forEach(({cb,c,s,opt})=>drawMember(cb,c,s,opt));};
 current.draw=drawAll;requestAnimationFrame(drawAll);
 
 /* freshness */
@@ -647,9 +702,9 @@ current.copyText=copyText;
 
 /* footnote */
 (function(){const f=document.getElementById('foot');
-  H('p',null,'Physical attack classes leave out M.ATK, Ignore M.DEF and M.DMG Bonus; magic attack classes leave out P.ATK, Ignore P.DEF and P.DMG Bonus. Defence/support classes show the 7 defence stats plus P.ATK, M.ATK and Ignore P.DEF. Summoner is split into physical, magic and support builds by its P.ATK and M.ATK.',f);
-  H('p',null,'Baselines: physical attackers for P.ATK, Ignore P.DEF and P.DMG Bonus; magic attackers for M.ATK, Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; defence/support characters for their own P.ATK, M.ATK and Ignore P.DEF; every character for defence stats. Percentile is the share of the baseline with a lower value. Class leaders count only classes with 3 or more members.',f);
-  H('p',null,'raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); raw M.DEF uses M.DEF and Equipment M.DEF% the same way. Data age is the oldest of the General, Advanced and Special sections, counted from the newest update in the file ('+D.ref+').',f);
+  H('p',null,'Physical attack classes leave out M.ATK, Ignore M.DEF and M.DMG Bonus; magic attack classes leave out P.ATK, Ignore P.DEF and P.DMG Bonus. Defence/support classes show the 7 defence stats plus Ignore P.DEF and the ATK they use: P.ATK for Gypsy and Minstrel, M.ATK for Biochemist, High Priest and Summoner (support). Summoner is split into physical, magic and support builds by its P.ATK and M.ATK.',f);
+  H('p',null,'Baselines: physical attackers for P.ATK, Ignore P.DEF and P.DMG Bonus; magic attackers for M.ATK, Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; defence/support characters for their own Ignore P.DEF, and support classes that use the same ATK for P.ATK and M.ATK; every character for defence stats. Percentile is the share of the baseline with a lower value. Class leaders count only classes with 3 or more members.',f);
+  H('p',null,'raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); raw M.DEF uses M.DEF and Equipment M.DEF% the same way. DEF left after Ignore = raw P.DEF minus the median Ignore P.DEF of physical attackers, and raw M.DEF minus the median Ignore M.DEF of magic attackers; below 0 means the typical attacker ignores all of it. Data age is the oldest of the General, Advanced and Special sections, counted from the newest update in the file ('+D.ref+').',f);
   if(D.notes&&D.notes.length)H('p',null,'Left out as misread: '+list(D.notes)+'.',f);})();
 }
 
@@ -741,13 +796,18 @@ function buildData(text,name){
 
 /* ---------- loading: data.csv from the repository; the copy built into the page is the fallback ---------- */
 try{localStorage.removeItem('roocstats.upload.v1');}catch(e){}
+(function(){const sw=document.getElementById('themeSw'),root=document.documentElement;
+  const mark=t=>sw.querySelectorAll('button[data-t]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===t)));
+  mark(root.classList.contains('t-light')?'light':'dark');
+  sw.addEventListener('click',e=>{const b=e.target.closest('button[data-t]');if(!b)return;const t=b.dataset.t;
+    root.classList.remove('t-dark','t-light');root.classList.add('t-'+t);mark(t);try{localStorage.setItem('roocstats.theme',t);}catch(err){}});})();
 const dsText=document.getElementById('dsText'),dsMsg=document.getElementById('dsMsg');
 function show(D){render(D);watchSections();dsText.textContent='';H('b',null,D.name,dsText);dsText.appendChild(document.createTextNode(` · ${D.count} characters · newest update ${D.ref}`));}
 show(buildData(EMBED.text,EMBED.name));
 (async()=>{let txt;try{const r=await fetch('data.csv',{cache:'no-store'});if(!r.ok)return;txt=await r.text();}catch(e){return;}
   try{show(buildData(txt,'data.csv'));}catch(e){dsMsg.textContent=`data.csv could not be read (${e.message}), so the page shows its built-in copy.`;dsMsg.classList.add('bad');}
 })();
-window.roocstats={data:()=>current.D};
+window.roocstats={data:()=>current.D,redraw:()=>current.draw()};
 })();
 </script>
 </body>
