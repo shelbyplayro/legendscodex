@@ -91,17 +91,20 @@ h4{font-size:19px;font-weight:600}
 .gtitle h2{font-size:30px}
 .gtitle span{color:var(--muted);font-size:13.5px;letter-spacing:.02em}
 
-.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px 36px;margin:0;padding:0;list-style:none}
-.findings li{display:grid;gap:8px;align-content:start;min-width:0;padding-top:16px;border-top:1px solid var(--line);position:relative}
-.findings li::before{content:"";position:absolute;top:-1px;left:0;width:32px;height:1px;background:var(--gold)}
-.findings b{font-family:var(--f-display);font-weight:600;font-size:20px;line-height:1.2}
-.findings span{color:var(--ink-2);font-size:14px}
+.glance{display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px;align-items:stretch}
+.mbox,.cbox{background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.mbox{display:grid;justify-items:center;align-content:center;gap:10px;padding:22px 12px;text-align:center}
+.mbox strong,.cbox strong{font-family:var(--f-display);font-weight:500;font-variant-numeric:lining-nums tabular-nums;line-height:1;letter-spacing:-.01em}
+.mbox strong{font-size:64px}
+.mbox span{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.cbox{padding:16px 28px;column-count:3;column-gap:40px}
+.cbox a{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);font-size:13.5px;break-inside:avoid}
+.cbox a:hover span{color:var(--gold-text)}
+.cbox strong{font-size:23px}
+@media (max-width:1100px){.cbox{column-count:2}}
+@media (max-width:600px){.glance{grid-template-columns:minmax(0,1fr)}.mbox{grid-template-columns:auto auto;justify-content:center;align-items:baseline;gap:0 14px;padding:14px}.mbox strong{font-size:44px}.cbox{padding:8px 20px}}
+@media (max-width:380px){.cbox{column-count:1}}
 
-.index{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
-.index .ig{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-right:6px}
-.index a{font-size:13.5px;color:var(--ink);text-decoration:none;border:1px solid var(--axis);border-radius:999px;padding:5px 14px;background:var(--surface);transition:border-color .2s,background .2s}
-.index a:hover{border-color:var(--gold);background:var(--gold-wash)}
-.index .br{flex-basis:100%;height:0}
 :focus-visible{outline:1.5px solid var(--gold);outline-offset:3px}
 a{color:inherit}
 
@@ -281,7 +284,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 .theme-sw svg{flex:none}
 @media (min-width:1240px){.theme-sw{top:calc(env(safe-area-inset-top,0px) + 16px);right:16px}}
 .scrim{position:fixed;inset:0;z-index:29;background:color-mix(in srgb,var(--ink) 30%,transparent)}
-@media (min-width:1240px){#index{display:none}.scrim{display:none}}
+@media (min-width:1240px){.scrim{display:none}}
 @media (max-width:1239px){
   .shell{display:block;max-width:none}
   .shell>.wrap{margin:0 auto}
@@ -339,12 +342,10 @@ html.zoomed{overflow:hidden}
   </section>
   <hr class="rule">
 
-  <section id="summary" class="anchor" aria-labelledby="h-find">
-    <div class="sec-head"><div><h3 id="h-find">What the data shows</h3></div></div>
-    <ul class="findings" id="findings"></ul>
+  <section id="summary" class="anchor" aria-labelledby="h-guild">
+    <div class="sec-head"><div><h3 id="h-guild">At a glance</h3></div></div>
+    <div id="glance"></div>
   </section>
-
-  <nav class="index" id="index" aria-label="Jump to a class"></nav>
 
   <div class="part anchor" id="part1"><span class="pn">Part I</span><h2>Every class, every stat</h2></div>
 
@@ -395,25 +396,25 @@ html.zoomed{overflow:hidden}
 const EMBED=JSON.parse(document.getElementById('data').textContent);
 const current={draw:()=>{},copyText:'',D:null};
 function render(D){
-['findings','index','scale','matrixWrap','legendMulti','multi','classes','actions','foot','sideNav'].forEach(id=>{document.getElementById(id).textContent='';});
+['glance','scale','matrixWrap','legendMulti','multi','classes','actions','foot','sideNav'].forEach(id=>{document.getElementById(id).textContent='';});
 document.getElementById('copyNote').textContent='';document.getElementById('copyFallback').hidden=true;
 current.D=D;
 const M=D.members;
 const GROUPS=[
   {n:0,t:'ATK',s:[['pa','P.ATK',['P.ATK'],'Attack'],['ma','M.ATK',['M.ATK'],'Attack']]},
-  {n:1,t:'raw DEF',s:[['rp','raw P.DEF',['raw','P.DEF'],'Defence'],['rm','raw M.DEF',['raw','M.DEF'],'Defence']]},
+  {n:1,t:'Raw DEF',s:[['rp','Raw P.DEF',['Raw','P.DEF'],'Defence'],['rm','Raw M.DEF',['Raw','M.DEF'],'Defence']]},
   {n:2,t:'Ignore DEF',s:[['ip','Ignore P.DEF',['Ignore','P.DEF'],'Attack'],['im','Ignore M.DEF',['Ignore','M.DEF'],'Attack']]},
   {n:3,t:'Demi-Human',s:[['dd','DMG to Demi-Human',['Demi','DMG'],'Attack'],['dr','Demi-Human Reduction',['Demi','Red.'],'Defence']]},
   {n:4,t:'Medium',s:[['md','DMG to Medium',['Medium','DMG'],'Attack'],['mr','Medium Reduction',['Medium','Red.'],'Defence']]},
-  {n:5,t:'PvP',s:[['vb','PVP DMG Bonus',['PVP','Bonus'],'Attack'],['vr','PVP DMG Reduction',['PVP','Red.'],'Defence']]},
+  {n:5,t:'PVP',s:[['vb','PVP DMG Bonus',['PVP','Bonus'],'Attack'],['vr','PVP DMG Reduction',['PVP','Red.'],'Defence']]},
   {n:6,t:'DMG Bonus',s:[['pb','P.DMG Bonus',['P.DMG','Bonus'],'Attack'],['mb','M.DMG Bonus',['M.DMG','Bonus'],'Attack']]},
   {n:7,t:'DMG Reduction',s:[['pr','P.DMG Reduction',['P.DMG','Red.'],'Defence'],['mdr','M.DMG Reduction',['M.DMG','Red.'],'Defence']]}
 ];
 const UNIT={pa:'',ma:'',rp:'',rm:'',ip:'',im:'',vb:'',vr:'',dd:'%',dr:'%',md:'%',mr:'%',pb:'%',mb:'%',pr:'%',mdr:'%'};
-const SHORT={pa:'P.ATK',ma:'M.ATK',rp:'raw P.DEF',rm:'raw M.DEF',ip:'Ignore P.DEF',im:'Ignore M.DEF',dd:'Demi-Human',dr:'Demi-Human',md:'Medium',mr:'Medium',vb:'PVP',vr:'PVP',pb:'P.DMG',mb:'M.DMG',pr:'P.DMG',mdr:'M.DMG'};
+const SHORT={pa:'P.ATK',ma:'M.ATK',rp:'Raw P.DEF',rm:'Raw M.DEF',ip:'Ignore P.DEF',im:'Ignore M.DEF',dd:'Demi-Human',dr:'Demi-Human',md:'Medium',mr:'Medium',vb:'PVP',vr:'PVP',pb:'P.DMG',mb:'M.DMG',pr:'P.DMG',mdr:'M.DMG'};
 const STATS=[];GROUPS.forEach((g,gi)=>g.s.forEach(([k,name,lab,side])=>STATS.push({k,name,lab,side,g,gi,short:SHORT[k]})));
 const CLS=D.classes.map(c=>Object.assign({},c));
-const GT={phys:'Physical attack classes',mag:'Magic attack classes',sup:'Defence / support classes'};
+const GT={phys:'Physical attack classes',mag:'Magic attack classes',sup:'Defence/support classes'};
 const SKIP={phys:['ma','im','mb'],mag:['pa','ip','pb'],sup:['im','dd','md','vb','pb','mb']};
 const CSKIP={'Gypsy':['ma'],'Minstrel':['ma'],'High Priest':['pa'],'Biochemist':['pa'],'Summoner-support':['pa']};
 const uses=(c,k)=>!SKIP[c.gt].includes(k)&&!(CSKIP[c.k]||[]).includes(k);
@@ -423,7 +424,7 @@ function S(tag,a,p){const e=document.createElementNS(NS,tag);for(const k in a)e.
 function H(tag,cls,text,p){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;if(p)p.appendChild(e);return e;}
 const fmt=(v,u)=>{if(v==null)return '–';if(u==='±'){const r=Math.round(v);return (r>0?'+':r<0?'−':'')+Math.abs(r).toLocaleString('en-US');}if(u==='%')return (Math.round(v*10)/10).toFixed(1)+'%';return Math.round(v).toLocaleString('en-US');};
 const med=a=>{const v=a.slice().sort((p,q)=>p-q);const n=v.length;if(!n)return null;return n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2;};
-const ageChip=m=>m.age<=14?null:H('span','chip '+(m.age>30?'old':'stale'),`data ${Math.floor(m.age)} d old`);
+const ageChip=m=>m.age<=14?null:H('span','chip '+(m.age>30?'old':'stale'),`${Math.floor(m.age)} days old`);
 const ord=n=>{n=Math.round(n);const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
 const WORDS=['no','one','two','three','four','five','six','seven','eight','nine'];
 const num=n=>n<10?WORDS[n]:String(n);
@@ -439,15 +440,15 @@ const SUPK=['pa','ma','ip'];
 const REAL=k=>k.replace(/_sup$/,'');
 const bk=(k,c)=>SUPK.includes(k)&&c&&c.gt==='sup'?k+'_sup':k;
 const inPool=(k,m)=>!POOL[k]||POOL[k](m);
-const BASE={pa:'physical attackers',ip:'physical attackers',pb:'physical attackers',ma:'magic attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',pa_sup:'support classes using P.ATK',ma_sup:'support classes using M.ATK',ip_sup:'defence/support characters'};
-const pctLab=k=>BASE[k]?`percentile among ${BASE[k]}`:'guild percentile';
+const BASE={pa:'physical attackers',ip:'physical attackers',pb:'physical attackers',ma:'magic attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',pa_sup:'support classes using P.ATK',ma_sup:'support classes using M.ATK',ip_sup:'defence/support members'};
+const pctLab=k=>BASE[k]?`among ${BASE[k]}`:'in the guild';
 const medLab=k=>BASE[k]?`Median of ${BASE[k]}`:'Guild median';
 const SORTED={};STATS.map(s=>s.k).concat(SUPK.map(k=>k+'_sup')).forEach(k=>{SORTED[k]=M.filter(m=>inPool(k,m)).map(m=>m[REAL(k)]).filter(v=>v!=null).sort((a,b)=>a-b);});
 const pct=(k,v)=>{if(v==null)return null;const a=SORTED[k];if(!a.length)return null;let lo=0,eq=0;for(const x of a){if(x<v)lo++;else if(x===v)eq++;}return (lo+eq/2)/a.length*100;};
 const bin=p=>p==null?0:p<20?1:p<40?2:p<60?3:p<80?4:5;
 const GMED={};Object.keys(SORTED).forEach(k=>GMED[k]=med(SORTED[k]));
-const GAPS=[{k:'gp',src:'rp',ref:'ip',name:'DEF left after Ignore · vs physical',tab:'vs physical',side:'Defence',def:'raw P.DEF',ign:'Ignore P.DEF',pool:'physical attackers',zero:true},
-            {k:'gm',src:'rm',ref:'im',name:'DEF left after Ignore · vs magic',tab:'vs magic',side:'Defence',def:'raw M.DEF',ign:'Ignore M.DEF',pool:'magic attackers',zero:true}];
+const GAPS=[{k:'gp',src:'rp',ref:'ip',name:'DEF left after Ignore · vs physical',tab:'vs physical',side:'Defence',def:'Raw P.DEF',ign:'Ignore P.DEF',pool:'physical attackers',zero:true},
+            {k:'gm',src:'rm',ref:'im',name:'DEF left after Ignore · vs magic',tab:'vs magic',side:'Defence',def:'Raw M.DEF',ign:'Ignore M.DEF',pool:'magic attackers',zero:true}];
 GAPS.forEach(g=>{M.forEach(m=>{m[g.k]=m[g.src]!=null&&GMED[g.ref]!=null?m[g.src]-GMED[g.ref]:null;});UNIT[g.k]='±';
   SORTED[g.k]=M.map(m=>m[g.k]).filter(v=>v!=null).sort((a,b)=>a-b);GMED[g.k]=med(SORTED[g.k]);});
 CLS.forEach(c=>{c.st={};STATS.concat(GAPS).forEach(s=>{const has=c.members.filter(m=>m[s.k]!=null);if(!has.length){c.st[s.k]={n:0};return;}
@@ -463,17 +464,12 @@ const cname=k=>CLS.find(c=>c.k===k).name;
 /* header */
 document.getElementById('eyebrow').textContent=`LEGENDS · Prontera 1 · Ragnarok Origin Classic · data as of ${D.asOf}`;
 
-/* findings, computed from the data */
-(function(){const F=document.getElementById('findings');const add=(b,s)=>{const li=H('li',null,null,F);H('b',null,b,li);H('span',null,s,li);};
-  const ph=M.filter(m=>GTOF[m.b]==='phys').length,mg=M.filter(m=>GTOF[m.b]==='mag').length,at=ph+mg;
-  if(at)add('Attacker baselines',`Physical attackers (${ph} characters) have median P.ATK ${fmt(GMED.pa)}, Ignore P.DEF ${fmt(GMED.ip)} and P.DMG Bonus ${fmt(GMED.pb,'%')}. Magic attackers (${mg}) have M.ATK ${fmt(GMED.ma)}, Ignore M.DEF ${fmt(GMED.im)} and M.DMG Bonus ${fmt(GMED.mb,'%')}. All ${at} attackers together have median Medium DMG ${fmt(GMED.md,'%')}, Demi-Human DMG ${fmt(GMED.dd,'%')} and PVP Bonus ${fmt(GMED.vb)}.`);
-  const uneven=CLS.filter(c=>c.gt!=='sup'&&c.members.length>=3).map(c=>{const a=c.stats.filter(s=>s.side==='Attack'&&c.st[s.k].n).map(s=>({s,p:c.st[s.k].pm})).sort((x,y)=>y.p-x.p);return a.length>1?{c,hi:a[0],lo:a[a.length-1],g:a[0].p-a[a.length-1].p}:null;}).filter(Boolean).sort((x,y)=>y.g-x.g).slice(0,3);
-  if(uneven.length)add('No attack class is strong on every attack stat','Against other attackers, '+uneven.map(u=>`${u.c.name} is at the ${ord(u.hi.p)} percentile on ${u.hi.s.name} but the ${ord(u.lo.p)} on ${u.lo.s.name}`).join('; ')+'.');
-  const by=new Map();STATS.filter(s=>s.side==='Attack').forEach(s=>LEAD[s.k].forEach(k=>{if(!by.has(k))by.set(k,[]);by.get(k).push(s.name);}));
-  const dl=[...new Set(STATS.filter(s=>s.side==='Defence').flatMap(s=>LEAD[s.k]))].map(cname);
-  if(by.size)add('Class leaders by stat',`Among classes with 3 or more members: ${[...by].map(([k,a])=>`${cname(k)} leads ${list(a)}`).join('; ')}. Defence stats are led by ${list(dl)}.`);
-  const lows=CLS.filter(c=>c.members.length>=3).map(c=>({c,d:STATS.filter(s=>s.side==='Defence'&&LOW[s.k].includes(c.k)).map(s=>s.name),a:STATS.filter(s=>s.side==='Attack'&&uses(c,s.k)&&bk(s.k,c)===s.k&&LEAD[s.k].includes(c.k)).map(s=>s.name)})).sort((x,y)=>y.d.length-x.d.length)[0];
-  if(lows&&lows.d.length>=2)add(lows.a.length?`${lows.c.name} is the most one-sided class`:`${lows.c.name} is the thinnest on defence`,`${lows.a.length?`It leads ${list(lows.a)}, and h`:'H'}as the lowest median of any class with 3 or more members on ${num(lows.d.length)} defence stats: ${list(lows.d)}.`);
+/* at a glance: members, and how many play each class (Summoner builds counted together) */
+(function(){const G=document.getElementById('glance');const wrap=H('div','glance',null,G);
+  const mb=H('div','mbox',null,wrap);H('strong',null,String(M.length),mb);H('span',null,M.length===1?'Member':'Members',mb);
+  const box=H('div','cbox',null,wrap);box.setAttribute('aria-label','Members per class');const seen=new Map();
+  CLS.forEach(c=>{const game=c.members.length?c.members[0].cls:c.name;if(!seen.has(game))seen.set(game,c.slug);});
+  seen.forEach((slug,game)=>{const a=H('a',null,null,box);a.href='#'+slug;H('span',null,game,a);H('strong',null,String(M.filter(m=>m.cls===game).length),a);});
 })();
 
 
@@ -481,7 +477,7 @@ document.getElementById('eyebrow').textContent=`LEGENDS · Prontera 1 · Ragnaro
 (function(){const N=document.getElementById('sideNav');
   const sec=(title)=>{const d=H('div','sn-sec',null,N);H('div','sn-h',title,d);const ul=H('ul',null,null,d);return ul;};
   const item=(ul,href,label,count,cls)=>{const li=H('li',null,null,ul);const a=H('a',cls||null,label,li);a.href='#'+href;a.dataset.target=href;if(count!=null)H('span','sn-n',String(count),a);return a;};
-  let ul=sec('Overview');item(ul,'summary','What the data shows');item(ul,'medians','Class medians');item(ul,'charts','Highest and median');
+  let ul=sec('Overview');item(ul,'summary','At a glance');item(ul,'medians','Class medians');item(ul,'charts','Highest and median');
   ['phys','mag','sup'].forEach(g=>{const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;const u=sec(GT[g].replace(' classes',''));
     cl.forEach(c=>item(u,c.slug,c.name,c.members.length));});
   ul=sec('More');item(ul,'upd','Data freshness');item(ul,'foot','How it is calculated');
@@ -528,11 +524,9 @@ function niceTicks(lo,hi,n){const span=hi-lo||1;const s0=span/n;const mg=Math.po
   const out=[];const end=Math.ceil(hi/step-1e-9)*step;for(let v=Math.floor(lo/step)*step;v<=end+step*0.001;v+=step)out.push(Math.round(v*1000)/1000);return {ticks:out,step};}
 const tickFmt=(v,u,step)=>u==='±'?(v<0?'−':'')+Math.abs(Math.round(v)).toLocaleString('en-US'):u==='%'?(step<1?v.toFixed(1):Math.round(v))+'%':Math.round(v).toLocaleString('en-US');
 
-/* index + scale */
-(function(){const I=document.getElementById('index');['phys','mag','sup'].forEach((g,gi)=>{const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;if(I.children.length)H('span','br',null,I);H('span','ig',GT[g],I);
-  cl.forEach(c=>{const a=H('a',null,`${c.name} · ${c.members.length}`,I);a.href='#'+c.slug;});});})();
+/* scale */
 (function(){const s=document.getElementById('scale');H('span',null,'Percentile',s);['0–20','20–40','40–60','60–80','80–100'].forEach((t,i)=>{const w=H('span',null,null,s);H('i','b'+(i+1),null,w);H('span',null,t,w);});
-  let w=H('span',null,null,s);H('i','ld',null,w);H('span',null,'Class leader',w);w=H('span',null,null,s);H('i','nai',null,w);H('span',null,'Not read',w);})();
+  let w=H('span',null,null,s);H('i','ld',null,w);H('span',null,'Class leader',w);w=H('span',null,null,s);H('i','nai',null,w);H('span',null,'Not used',w);})();
 
 /* matrix: one compact table, stat pairs side by side */
 (function(){const wrap=document.getElementById('matrixWrap');const tw=H('div','tbl-wrap mx',null,wrap);const t=H('table','matrix compact',null,tw);
@@ -545,9 +539,9 @@ const tickFmt=(v,u,step)=>u==='±'?(v<0?'−':'')+Math.abs(Math.round(v)).toLoca
   CLS.forEach(c=>{if(c.gt!==last){last=c.gt;const gr=H('tr','gh',null,tb);const td=H('td',null,GT[last],gr);td.colSpan=STATS.length+1;}
     const tr=H('tr',null,null,tb);const td0=H('td','stick',null,tr);const a=H('a',null,c.name,td0);a.href='#'+c.slug;H('span','cn',String(c.members.length),td0);
     STATS.forEach(s=>{const x=c.st[s.k];
-      if(!uses(c,s.k)){const td=H('td','h na',x.n?fmt(x.med,UNIT[s.k]):'–',tr);td.title=`${s.name} is not read for ${c.name}`;return;}
+      if(!uses(c,s.k)){const td=H('td','h na',x.n?fmt(x.med,UNIT[s.k]):'–',tr);td.title=`${c.name} doesn't use ${s.name}`;return;}
       const td=H('td','h'+(x.n?' b'+bin(x.pm):'')+(LEADK[bk(s.k,c)].includes(c.k)?' lead':''),x.n?fmt(x.med,UNIT[s.k]):'–',tr);
-      td.title=x.n?`${c.name} · ${s.name}: median ${fmt(x.med,UNIT[s.k])} (${pctLab(bk(s.k,c))} ${Math.round(x.pm)})${x.n<c.members.length?` · ${x.n} of ${c.members.length} with data`:''}`:'No data';});});
+      td.title=x.n?`${c.name} · ${s.name}: median ${fmt(x.med,UNIT[s.k])}, ${ord(x.pm)} percentile ${pctLab(bk(s.k,c))}${x.n<c.members.length?` · ${x.n} of ${c.members.length} with data`:''}`:'No data';});});
 })();
 
 /* Part I line charts */
@@ -560,7 +554,7 @@ const tickFmt=(v,u,step)=>u==='±'?(v<0?'−':'')+Math.abs(Math.round(v)).toLoca
   document.getElementById('codes').textContent='Class codes: '+CLS.map(c=>`${c.ab} ${c.name}`).join(' · ');})();
 const multiBoxes=[];
 (function(){const box=document.getElementById('multi');STATS.forEach(s=>{const d=H('div','mc',null,box);const mt=H('div','mt',null,d);const h=H('h4',null,s.name,mt);H('small',null,s.side,h);
-  const lead=LEAD[s.k].map(cname).join(', ');H('span',null,lead?`Highest median: ${lead}`:'',mt);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
+  const lead=list(LEAD[s.k].map(cname));H('span',null,lead?`Highest median: ${lead}`:'',mt);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
 function drawMulti(cb,s,opt){
   cb.textContent='';const W=Math.max(280,cb.clientWidth),narrow=W<460;const u=UNIT[s.k];
   const m={l:narrow?40:48,r:8,t:12,b:narrow?40:26};const Hh=opt&&opt.h?opt.h:210;
@@ -585,8 +579,8 @@ function drawMulti(cb,s,opt){
   ov.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)*(W/r.width);const i=Math.max(0,Math.min(CLS.length-1,Math.floor((px-m.l)/step)));
     const c=CLS[i],x=c.st[s.k];cross.setAttribute('x1',X(i));cross.setAttribute('x2',X(i));cross.style.display='';
     tip.textContent='';H('div','tv',c.name,tip);H('div','nm',s.name,tip);
-    if(!uses(c,s.k))H('div','nm','Not read for this class',tip);else if(!x.n)H('div','nm','No data',tip);
-    else{tipRow('var(--sapphire)','Highest',fmt(x.hi,u),x.leaders.map(z=>z.c).join(', '));tipRow('var(--gold)','Median',fmt(x.med,u));tipRow('var(--base)',medLab(bk(s.k,c)),fmt(GMED[bk(s.k,c)],u));H('div','nm',`${x.n} ${x.n===1?'member':'members'} with data`,tip);}
+    if(!uses(c,s.k))H('div','nm','Not used by this class',tip);else if(!x.n)H('div','nm','No data',tip);
+    else{tipRow('var(--sapphire)','Highest',fmt(x.hi,u),list(x.leaders.map(z=>z.c)));tipRow('var(--gold)','Median',fmt(x.med,u));tipRow('var(--base)',medLab(bk(s.k,c)),fmt(GMED[bk(s.k,c)],u));H('div','nm',`${x.n} ${x.n===1?'member':'members'} with data`,tip);}
     tip.hidden=false;moveTip(e);});
   ov.addEventListener('pointerleave',()=>{cross.style.display='none';tip.hidden=true;});
 }
@@ -597,10 +591,10 @@ function gapCard(c,cards,lg){
   const ct=H('div','ct',null,cd);H('b',null,'DEF left after Ignore',ct);const ctr=H('span','ctr',null,ct);H('span',null,'Defence',ctr);
   if(!GAPS.some(g=>c.st[g.k].n)){H('div','nod','No data for this class',cd);return;}
     const tw=H('div','gtwin',null,cd);GAPS.forEach(g=>{const x=c.st[g.k];const d=H('div',null,null,tw);H('span','gl',g.tab,d);H('strong',null,x.n?fmt(x.med,'±'):'–',d);});
-    H('div','gsub',`class medians · raw DEF minus the median Ignore DEF of physical attackers (${fmt(GMED.ip)}) and magic attackers (${fmt(GMED.im)})`,cd);
+    H('div','gsub',`Class medians · Raw DEF minus the median Ignore DEF of physical attackers (${fmt(GMED.ip)}) and magic attackers (${fmt(GMED.im)})`,cd);
     GAPS.forEach(g=>{H('div','gmini-h',g.tab,cd);const pane=H('div','chart mchart mini',null,cd);if(c.st[g.k].n)memberCharts.push({cb:pane,c,s:g,opt:{h:104,noNames:true}});else H('div','nod','No data',pane);});
     const nd=c.members.filter(mm=>GAPS.some(g=>mm[g.k]==null)).map(mm=>mm.c);if(nd.length)H('div','nod',`No data: ${list(nd)}`,cd);
-  ctr.appendChild(xbtn(`Expand DEF left after Ignore charts for ${c.name}`,b=>openZoom(b,`${c.name} · Defence stat`,'DEF left after Ignore',`Class medians ${GAPS.map(g=>`${g.tab} ${fmt(c.st[g.k].med,'±')}`).join(' · ')} · raw DEF minus the median Ignore DEF of physical attackers (${fmt(GMED.ip)}) and magic attackers (${fmt(GMED.im)})`,lg,(z,o)=>{z.textContent='';GAPS.forEach(g=>{H('div','gmini-h',g.tab,z);const d=H('div','chart',null,z);if(c.st[g.k].n)drawMember(d,c,g,{h:Math.round(o.h*0.42)});else H('div','nod','No data',d);});})));
+  ctr.appendChild(xbtn(`Expand DEF left after Ignore charts for ${c.name}`,b=>openZoom(b,`${c.name} · Defence stat`,'DEF left after Ignore',`Class medians ${GAPS.map(g=>`${g.tab} ${fmt(c.st[g.k].med,'±')}`).join(' · ')} · Raw DEF minus the median Ignore DEF of physical attackers (${fmt(GMED.ip)}) and magic attackers (${fmt(GMED.im)})`,lg,(z,o)=>{z.textContent='';GAPS.forEach(g=>{H('div','gmini-h',g.tab,z);const d=H('div','chart',null,z);if(c.st[g.k].n)drawMember(d,c,g,{h:Math.round(o.h*0.42)});else H('div','nod','No data',d);});})));
 }
 /* Part II */
 const box=document.getElementById('classes');const memberCharts=[];
@@ -611,7 +605,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
   if(mm.age>14)H('div','nm',`Data ${Math.floor(mm.age)} days old`,tip);tip.hidden=false;moveTip(e);}
 ['phys','mag','sup'].forEach(g=>{
   const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;
-  const gt=H('div','gtitle anchor',null,box);gt.id='g-'+g;H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${cl[0].stats.length} stats`,gt);
+  const gt=H('div','gtitle anchor',null,box);gt.id='g-'+g;H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} members · ${cl[0].stats.length} stats`,gt);
   cl.forEach(c=>{
     const sec=H('section','sheet cls',null,box);sec.id=c.slug;
     const ch=H('div','ch',null,sec);H('h3',null,c.name,ch);H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''}`,ch);
@@ -620,8 +614,8 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
     const sum=H('p','sum',null,sec);const tx=s=>sum.appendChild(document.createTextNode(s));
     if(wd.length){if(!above.length)H('b',null,`Class median below baseline on ${below.length===wd.length?'every stat':`${below.length} of ${wd.length} stats`}. `,sum);
       else if(above.length===wd.length)H('b',null,`Class median above baseline on every stat. `,sum);
-      else{H('b',null,`Class median above baseline on ${above.length} of ${wd.length} stats: `,sum);tx(list(above)+'. ');}
-      const leads=c.stats.filter(s=>LEADK[bk(s.k,c)].includes(c.k)).map(s=>s.name+(bk(s.k,c).endsWith('_sup')?' (among defence/support classes)':'')+(LEADK[bk(s.k,c)].length>1?' (tied)':''));
+      else{H('b',null,`Class median above baseline on ${above.length} of ${wd.length<c.stats.length?`the ${wd.length} stats with data`:`${wd.length} stats`}: `,sum);tx(list(above)+'. ');}
+      const leads=c.stats.filter(s=>LEADK[bk(s.k,c)].includes(c.k)).map(s=>s.name+(bk(s.k,c).endsWith('_sup')?` (among ${BASE[bk(s.k,c)]})`:'')+(LEADK[bk(s.k,c)].length>1?' (tied)':''));
       if(leads.length){H('b',null,'Highest class median in the guild: ',sum);tx(list(leads)+'.');}
       if(c.members.length<3)tx(` Based on ${c.members.length} ${c.members.length===1?'member':'members'} only.`);
       const miss=c.stats.filter(s=>!c.st[s.k].n).map(s=>s.name);if(miss.length)tx(` No data for ${list(miss)}.`);}
@@ -636,7 +630,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
     function statCard(s){const x=c.st[s.k],u=UNIT[s.k];const cd=H('article','card',null,cards);
       const ct=H('div','ct',null,cd);H('b',null,s.name,ct);const ctr=H('span','ctr',null,ct);H('span',null,s.side,ctr);
       if(!x.n){H('div','nod','No data for this class',cd);return;}
-      const cv=H('div','cv',null,cd);H('strong',null,fmt(x.med,u),cv);const kb=bk(s.k,c);H('span',null,`class median · ${BASE[kb]?`median of ${BASE[kb]}`:'guild median'} ${fmt(GMED[kb],u)}`,cv);
+      const cv=H('div','cv',null,cd);H('strong',null,fmt(x.med,u),cv);const kb=bk(s.k,c);H('span',null,`Class median · ${BASE[kb]?`median of ${BASE[kb]}`:'guild median'} ${fmt(GMED[kb],u)}`,cv);
       ctr.appendChild(xbtn(`Expand ${s.name} chart for ${c.name}`,b=>openZoom(b,`${c.name} · ${s.side} stat`,s.name,`Class median ${fmt(x.med,u)} · ${BASE[kb]?`median of ${BASE[kb]}`:'guild median'} ${fmt(GMED[kb],u)}`,lg,(z,o)=>drawMember(z,c,s,o))));
       const cb=H('div','chart mchart',null,cd);memberCharts.push({cb,c,s});
       const nd=c.members.filter(mm=>mm[s.k]==null).map(mm=>mm.c);if(nd.length)H('div','nod',`No data: ${list(nd)}`,cd);
@@ -696,16 +690,16 @@ let copyText='';
 (function(){const A=document.getElementById('actions');const groups=[['Data older than 30 days',m=>m.age>30],['Data 15–30 days old',m=>m.age>14&&m.age<=30]];const lines=[];let total=0;
   groups.forEach(([title,f])=>{const ms=M.filter(f).sort((a,b)=>b.age-a.age);if(!ms.length)return;total+=ms.length;const col=H('div','act-col',null,A);H('h4',null,`${title} · ${ms.length}`,col);const ul=H('ul',null,null,col);lines.push(`**${title}**`);
     ms.forEach(m=>{const li=H('li',null,null,ul);const c=CLS.find(z=>z.k===m.b);H('b',null,`${m.c} · ${c?c.name:m.cls}`,li);H('span',null,`${m.d} · ${Math.floor(m.age)} days old`,li);lines.push(`- ${m.d} (${m.c}) ${Math.floor(m.age)} days old`);});});
-  document.getElementById('updCount').textContent=`· ${total} of ${M.length} characters older than 14 days`;
+  document.getElementById('updCount').textContent=`· ${total} of ${M.length} members with data older than 14 days`;
   copyText=lines.length?`Please update your stats in the tracker\n${lines.join('\n')}`:'';})();
 current.copyText=copyText;
 
 /* footnote */
 (function(){const f=document.getElementById('foot');
-  H('p',null,'Physical attack classes leave out M.ATK, Ignore M.DEF and M.DMG Bonus; magic attack classes leave out P.ATK, Ignore P.DEF and P.DMG Bonus. Defence/support classes show the 7 defence stats plus Ignore P.DEF and the ATK they use: P.ATK for Gypsy and Minstrel, M.ATK for Biochemist, High Priest and Summoner (support). Summoner is split into physical, magic and support builds by its P.ATK and M.ATK.',f);
-  H('p',null,'Baselines: physical attackers for P.ATK, Ignore P.DEF and P.DMG Bonus; magic attackers for M.ATK, Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; defence/support characters for their own Ignore P.DEF, and support classes that use the same ATK for P.ATK and M.ATK; every character for defence stats. Percentile is the share of the baseline with a lower value. Class leaders count only classes with 3 or more members.',f);
-  H('p',null,'raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); raw M.DEF uses M.DEF and Equipment M.DEF% the same way. DEF left after Ignore = raw P.DEF minus the median Ignore P.DEF of physical attackers, and raw M.DEF minus the median Ignore M.DEF of magic attackers; below 0 means the typical attacker ignores all of it. Data age is the oldest of the General, Advanced and Special sections, counted from the newest update in the file ('+D.ref+').',f);
-  if(D.notes&&D.notes.length)H('p',null,'Left out as misread: '+list(D.notes)+'.',f);})();
+  H('p',null,'Physical attack classes leave out M.ATK, Ignore M.DEF and M.DMG Bonus; magic attack classes leave out P.ATK, Ignore P.DEF and P.DMG Bonus. Defence/support classes show the 7 defence stats, Ignore P.DEF and the ATK they use: P.ATK for Gypsy and Minstrel; M.ATK for Biochemist, High Priest and Summoner (support). Summoner is split into physical, magic and support builds by comparing its P.ATK and M.ATK.',f);
+  H('p',null,'Baselines: physical attackers for P.ATK, Ignore P.DEF and P.DMG Bonus; magic attackers for M.ATK, Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; every member for defence stats. Defence/support classes are compared with each other: with all defence/support members on Ignore P.DEF, and with the support classes that use the same ATK on P.ATK and M.ATK. Percentile is the share of the baseline with a lower value. Class leaders count only classes with 3 or more members.',f);
+  H('p',null,'Raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); Raw M.DEF uses M.DEF and Equipment M.DEF% the same way. DEF left after Ignore is Raw P.DEF minus the median Ignore P.DEF of physical attackers, and Raw M.DEF minus the median Ignore M.DEF of magic attackers; below 0 means a typical attacker ignores all of it. Data age is the oldest of the General, Advanced and Special sections, counted from the latest update in the file ('+D.ref+').',f);
+  const mis=[D.notes&&D.notes.length?'Left out as misread: '+D.notes.join('; ')+'.':'',D.zero?'Special values recorded as 0 are treated as missing.':''].filter(Boolean).join(' ');if(mis)H('p',null,mis,f);})();
 }
 
 /* ---------- shared, data-independent wiring ---------- */
@@ -769,12 +763,14 @@ function buildData(text,name){
   const NUMS=['Power','HP','P.ATK','P.DEF','M.ATK','M.DEF','Refine M.ATK',...Object.values(STAT_COLS),...SPECIAL];
   const R=rows.slice(1).map(r=>{const o={c:cell(r,'Character Name'),d:cell(r,'Discord Name'),cls:cell(r,'Class'),v:{},t:{}};NUMS.forEach(k=>o.v[k]=numv(r,k));[...ATTR_TIMES,'General Info Updated At'].forEach(k=>o.t[k]=tsv(r,k));return o;}).filter(o=>o.c&&o.cls);
   if(!R.length)throw new Error('The file has no rows with a character name and class.');
-  const notes=[];
-  R.forEach(o=>{if(o.v.HP!=null&&o.v.HP<10000){notes.push(`${o.c}'s HP`);o.v.HP=null;}});
-  R.forEach(o=>{const md=o.v['M.DEF'],ma=o.v['M.ATK'],rf=o.v['Refine M.ATK'];if((md!=null&&md<=0)||(ma!=null&&rf!=null&&ma===rf)){notes.push(`${o.c}'s M.ATK/M.DEF`);o.v['M.ATK']=null;o.v['M.DEF']=null;}});
-  ['M.DMG Reduction (%)','P.DMG Reduction (%)'].forEach(col=>{const bad=R.filter(o=>o.v[col]!=null&&o.v[col]>500);if(bad.length){notes.push(`${col.replace(' (%)','%')} for ${bad.map(o=>o.c).join(', ')}`);bad.forEach(o=>o.v[col]=null);}});
-  let zero=false;R.forEach(o=>SPECIAL.forEach(c=>{if(o.v[c]===0){zero=true;o.v[c]=null;}}));if(zero)notes.push('Special values recorded as 0 (read as missing)');
-  R.forEach(o=>{const v=o.v['M Size Monster Reduction (%)'];if(v!=null&&v<10){notes.push(`${o.c}'s Demi-Human/Medium values`);['M Size Monster Reduction (%)','Demi-Human Monster Reduction (%)','Demi-Human Monster Damage (%)'].forEach(c=>o.v[c]=null);}});
+  const and=a=>a.length<=1?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
+  const bad={};const flag=(what,name)=>{(bad[what]=bad[what]||[]).push(name);};
+  R.forEach(o=>{if(o.v.HP!=null&&o.v.HP<10000){flag('HP',o.c);o.v.HP=null;}});
+  R.forEach(o=>{const md=o.v['M.DEF'],ma=o.v['M.ATK'],rf=o.v['Refine M.ATK'];if((md!=null&&md<=0)||(ma!=null&&rf!=null&&ma===rf)){flag('M.ATK and M.DEF',o.c);o.v['M.ATK']=null;o.v['M.DEF']=null;}});
+  ['M.DMG Reduction (%)','P.DMG Reduction (%)'].forEach(col=>{R.filter(o=>o.v[col]!=null&&o.v[col]>500).forEach(o=>{flag(col.replace(' (%)',''),o.c);o.v[col]=null;});});
+  let zero=false;R.forEach(o=>SPECIAL.forEach(c=>{if(o.v[c]===0){zero=true;o.v[c]=null;}}));
+  R.forEach(o=>{const v=o.v['M Size Monster Reduction (%)'];if(v!=null&&v<10){flag('Demi-Human and Medium values',o.c);['M Size Monster Reduction (%)','Demi-Human Monster Reduction (%)','Demi-Human Monster Damage (%)'].forEach(c=>o.v[c]=null);}});
+  const notes=Object.entries(bad).map(([what,names])=>`${what} for ${and(names)}`);
   const raw=(def,pc)=>def==null||pc==null?null:(def-150)/(1+pc/100);
   R.forEach(o=>{o.rp=raw(o.v['P.DEF'],o.v['Equipment P.DEF%']);o.rm=raw(o.v['M.DEF'],o.v['Equipment M.DEF%']);
     const pa=o.v['P.ATK'],ma=o.v['M.ATK'];
@@ -791,7 +787,7 @@ function buildData(text,name){
     classes.push({k,name:k,ab:(k.replace(/[^A-Za-z]/g,'').slice(0,4)||k.slice(0,4)),gt:mi!=null&&mi>=2100?'phys':(mm!=null&&mm>=540?'mag':'sup')});});
   const ord={phys:0,mag:1,sup:2};classes.sort((a,b)=>ord[a.gt]-ord[b.gt]);
   const dm=(name||'').match(/(\d{4})-(\d{2})-(\d{2})/);
-  return {members,classes,notes,count:members.length,asOf:dm?dstr(Date.UTC(+dm[1],+dm[2]-1,+dm[3])):dstr(ref),ref:tstr(ref),refTs:ref,name:name||'data.csv'};
+  return {members,classes,notes,zero,count:members.length,asOf:dm?dstr(Date.UTC(+dm[1],+dm[2]-1,+dm[3])):dstr(ref),ref:tstr(ref),refTs:ref,name:name||'data.csv'};
 }
 
 /* ---------- loading: data.csv from the repository; the copy built into the page is the fallback ---------- */
@@ -802,10 +798,10 @@ try{localStorage.removeItem('roocstats.upload.v1');}catch(e){}
   sw.addEventListener('click',e=>{const b=e.target.closest('button[data-t]');if(!b)return;const t=b.dataset.t;
     root.classList.remove('t-dark','t-light');root.classList.add('t-'+t);mark(t);try{localStorage.setItem('roocstats.theme',t);}catch(err){}});})();
 const dsText=document.getElementById('dsText'),dsMsg=document.getElementById('dsMsg');
-function show(D){render(D);watchSections();dsText.textContent='';H('b',null,D.name,dsText);dsText.appendChild(document.createTextNode(` · ${D.count} characters · newest update ${D.ref}`));}
+function show(D){render(D);watchSections();dsText.textContent='';H('b',null,D.name,dsText);dsText.appendChild(document.createTextNode(` · ${D.count} members · latest update ${D.ref}`));}
 show(buildData(EMBED.text,EMBED.name));
 (async()=>{let txt;try{const r=await fetch('data.csv',{cache:'no-store'});if(!r.ok)return;txt=await r.text();}catch(e){return;}
-  try{show(buildData(txt,'data.csv'));}catch(e){dsMsg.textContent=`data.csv could not be read (${e.message}), so the page shows its built-in copy.`;dsMsg.classList.add('bad');}
+  try{show(buildData(txt,'data.csv'));}catch(e){dsMsg.textContent=`data.csv could not be read (${e.message}), so the page is showing its built-in copy.`;dsMsg.classList.add('bad');}
 })();
 window.roocstats={data:()=>current.D,redraw:()=>current.draw()};
 })();
