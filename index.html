@@ -83,6 +83,16 @@ h4{font-size:19px;font-weight:600}
 .sec-head>div{min-width:0}
 .sec-head h3{font-size:28px}
 .sec-head p{margin:8px 0 0;color:var(--ink-2);font-size:14px;max-width:72ch}
+.view{display:grid;grid-template-columns:minmax(0,1fr);gap:36px;min-width:0}
+.view>*{min-width:0}
+.vh{display:grid;gap:10px}
+.vh h1{font-size:clamp(40px,6vw,64px)}
+.vh .meta{color:var(--muted);font-size:13.5px;letter-spacing:.02em}
+.totop{display:flex;justify-content:flex-end}
+.totop button{font:inherit;font-size:12.5px;letter-spacing:.04em;color:var(--ink-2);background:var(--surface);border:1px solid var(--axis);border-radius:999px;padding:8px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,color .2s}
+.totop button:hover{border-color:var(--gold);color:var(--ink)}
+.vh h1:focus{outline:none}
+.cpage{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;min-width:0}
 .part{display:grid;gap:6px;padding-top:12px}
 .part .pn{font-family:var(--f-display);font-style:italic;font-size:20px;color:var(--gold-text)}
 .part h2{font-size:clamp(34px,4.6vw,48px)}
@@ -177,7 +187,7 @@ table.compact td,table.compact th{padding:6px 7px}
 
 .cls{scroll-margin-top:20px;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
 .cls>*{min-width:0}
-.cls .ch{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;align-items:baseline}
+.cls .ch{display:none}
 .cls .ch h3{font-size:clamp(30px,3.6vw,40px)}
 .cls .meta{color:var(--muted);font-size:13px;letter-spacing:.02em}
 .cls .sum{margin:0;font-size:14.5px;max-width:84ch;color:var(--ink-2)}
@@ -328,10 +338,11 @@ html.zoomed{overflow:hidden}
 <div class="scrim" id="scrim" hidden></div>
 <div class="shell">
 <aside class="side" id="side" aria-label="Page menu">
-  <a class="side-brand" href="#top"><span class="sb-t">LEGENDS Codex</span><span class="sb-s">Prontera 1</span></a>
+  <a class="side-brand" href="#overview"><span class="sb-t">LEGENDS Codex</span><span class="sb-s">Prontera 1</span></a>
   <nav id="sideNav"></nav>
 </aside>
 <div class="wrap" id="top">
+ <div class="view" id="v-overview">
   <header style="display:grid;gap:10px">
     <div class="eyebrow" id="eyebrow"></div>
     <h1>LEGENDS Codex</h1>
@@ -341,24 +352,23 @@ html.zoomed{overflow:hidden}
     <p id="dsMsg" class="dsmsg" role="status"></p>
   </section>
   <hr class="rule">
-
-  <section id="summary" class="anchor" aria-labelledby="h-guild">
+  <section id="summary" aria-labelledby="h-guild">
     <div class="sec-head"><div><h3 id="h-guild">At a glance</h3></div></div>
     <div id="glance"></div>
   </section>
-
-  <div class="part anchor" id="part1"><span class="pn">Part I</span><h2>Every class, every stat</h2></div>
-
-  <section class="sheet anchor" id="medians" aria-labelledby="h-mx">
+  <section class="sheet" id="medians" aria-labelledby="h-mx">
     <div class="sec-head">
       <div><h3 id="h-mx">Class medians</h3>
-      <p>Each cell is the class median, shaded by its percentile against the stat's baseline.</p></div>
+      <p>Each cell is the class median, shaded by its percentile against the stat's baseline. Click a class to open its page.</p></div>
       <div class="scale" id="scale"></div>
     </div>
     <div id="matrixWrap"></div>
   </section>
+ </div>
 
-  <section class="sheet anchor" id="charts" aria-labelledby="h-lines">
+ <div class="view" id="v-stats" hidden>
+  <header class="vh"><div class="eyebrow">LEGENDS Codex · every class</div><h1>Stat by stat</h1></header>
+  <section class="sheet" id="charts" aria-labelledby="h-lines">
     <div class="sec-head">
       <div><h3 id="h-lines">Highest and median, class by class</h3>
       <p id="multiDesc"></p></div>
@@ -367,18 +377,24 @@ html.zoomed{overflow:hidden}
     <div class="multi" id="multi"></div>
     <p class="codes" id="codes"></p>
   </section>
+  <div class="totop-slot"></div>
+ </div>
 
-  <div class="part anchor" id="part2"><span class="pn">Part II</span><h2>Class by class</h2></div>
+ <div class="view" id="v-class" hidden>
   <div id="classes" style="display:grid;gap:36px;min-width:0"></div>
+ </div>
 
-  <details class="sheet anchor" id="upd">
+ <div class="view" id="v-data" hidden>
+  <header class="vh"><div class="eyebrow">LEGENDS Codex</div><h1>About the data</h1></header>
+  <details class="sheet" id="upd" open>
     <summary>Data freshness <span id="updCount"></span></summary>
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px"><button class="btn" id="copyBtn" type="button">Copy list for Discord</button><span id="copyNote" role="status" class="muted" style="font-size:13px"></span></div>
     <div class="act-grid" id="actions"></div>
     <textarea id="copyFallback" hidden readonly aria-label="List text"></textarea>
   </details>
-
-  <div class="foot anchor" id="foot"></div>
+  <section class="sheet" aria-labelledby="h-how"><div class="sec-head"><div><h3 id="h-how">How it is calculated</h3></div></div><div class="foot" id="foot"></div></section>
+  <div class="totop-slot"></div>
+ </div>
 </div>
 </div>
 <div class="zoom" id="zoom" hidden role="dialog" aria-modal="true" aria-labelledby="zoomTitle">
@@ -477,10 +493,10 @@ document.getElementById('eyebrow').textContent=`LEGENDS · Prontera 1 · Ragnaro
 (function(){const N=document.getElementById('sideNav');
   const sec=(title)=>{const d=H('div','sn-sec',null,N);H('div','sn-h',title,d);const ul=H('ul',null,null,d);return ul;};
   const item=(ul,href,label,count,cls)=>{const li=H('li',null,null,ul);const a=H('a',cls||null,label,li);a.href='#'+href;a.dataset.target=href;if(count!=null)H('span','sn-n',String(count),a);return a;};
-  let ul=sec('Overview');item(ul,'summary','At a glance');item(ul,'medians','Class medians');item(ul,'charts','Highest and median');
+  let ul=sec('Overview');item(ul,'overview','Overview');item(ul,'stats','Stat by stat');
   ['phys','mag','sup'].forEach(g=>{const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;const u=sec(GT[g].replace(' classes',''));
     cl.forEach(c=>item(u,c.slug,c.name,c.members.length));});
-  ul=sec('More');item(ul,'upd','Data freshness');item(ul,'foot','How it is calculated');
+  ul=sec('More');item(ul,'data','About the data');
 })();
 /* tooltip helpers */
 const tip=document.getElementById('tip');
@@ -604,9 +620,11 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
   if(mm.age>14)H('div','nm',`Data ${Math.floor(mm.age)} days old`,tip);tip.hidden=false;moveTip(e);}
 ['phys','mag','sup'].forEach(g=>{
   const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;
-  const gt=H('div','gtitle anchor',null,box);gt.id='g-'+g;H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} members · ${cl[0].stats.length} stats`,gt);
-  cl.forEach(c=>{
-    const sec=H('section','sheet cls',null,box);sec.id=c.slug;
+  cl.forEach((c,ci)=>{
+    const pg=H('div','cpage',null,box);pg.id=c.slug;pg.hidden=true;
+    const hd=H('header','vh',null,pg);H('div','eyebrow',`${GT[g].replace(' classes','')} · ${ci+1} of ${cl.length}`,hd);H('h1',null,c.name,hd);
+    H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''} · ${c.stats.length} stats`,hd);
+    const sec=H('section','sheet cls',null,pg);
     const ch=H('div','ch',null,sec);H('h3',null,c.name,ch);H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''}`,ch);
     const wd=c.stats.filter(s=>c.st[s.k].n);
     const above=wd.filter(s=>c.st[s.k].med>GMED[bk(s.k,c)]).map(s=>s.name),below=wd.filter(s=>c.st[s.k].med<GMED[bk(s.k,c)]).map(s=>s.name);
@@ -642,7 +660,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
       H('td','h',fmt(mm.p),tr);c.stats.forEach(s=>{const v=mm[s.k];H('td','h'+(v!=null&&GMED[bk(s.k,c)]!=null&&v>GMED[bk(s.k,c)]?' up':''),fmt(v,UNIT[s.k]),tr);});});
     const mr=H('tr','medrow',null,tb);H('td','stick','Class median',mr);H('td','h',fmt(c.power),mr);c.stats.forEach(s=>H('td','h',fmt(c.st[s.k].med,UNIT[s.k]),mr));
     const br=H('tr','medrow',null,tb);H('td','stick','Baseline median',br);H('td','h','',br);c.stats.forEach(s=>H('td','h muted',fmt(GMED[bk(s.k,c)],UNIT[s.k]),br));
-    const tl=H('a','top-link','Back to the overview',H('div',null,null,sec));tl.href='#top';
+    pg.appendChild(toTop());
   });
 });
 function quant(a,q){if(!a.length)return null;const p=(a.length-1)*q,i=Math.floor(p),f=p-i;return a[i]+(a[Math.min(i+1,a.length-1)]-a[i])*f;}
@@ -681,7 +699,8 @@ function drawMember(cb,c,s,opt){
     cross.setAttribute('x1',pts[bi][0]);cross.setAttribute('x2',pts[bi][0]);cross.style.display='';memberTip(e,rows[bi],c,s,bi,n);});
   ov.addEventListener('pointerleave',()=>{cross.style.display='none';tip.hidden=true;});
 }
-const drawAll=()=>{multiBoxes.forEach(({cb,s})=>drawMulti(cb,s));memberCharts.forEach(({cb,c,s,opt})=>drawMember(cb,c,s,opt));};
+const onScreen=el=>el.getClientRects().length>0;
+const drawAll=()=>{multiBoxes.forEach(({cb,s})=>{if(onScreen(cb))drawMulti(cb,s);});memberCharts.forEach(({cb,c,s,opt})=>{if(onScreen(cb))drawMember(cb,c,s,opt);});};
 current.draw=drawAll;requestAnimationFrame(drawAll);
 
 /* freshness */
@@ -708,7 +727,7 @@ document.getElementById('copyBtn').addEventListener('click',()=>{const note=docu
   if(!copyText){note.textContent='Everyone is up to date';return;}
   const fallback=()=>{fb.value=copyText;fb.hidden=false;fb.focus();fb.select();note.textContent='Automatic copy failed. The text is selected in the box below; press Ctrl+C.';};
   try{navigator.clipboard.writeText(copyText).then(()=>{note.textContent='Copied';fb.hidden=true;},fallback);}catch(e){fallback();}});
-let lastW=0,rt;const obs=document.getElementById('classes');new ResizeObserver(()=>{const w=obs.clientWidth;if(w===lastW)return;lastW=w;clearTimeout(rt);rt=setTimeout(()=>current.draw(),100);}).observe(obs);
+let lastW=0,rt;const obs=document.getElementById('top');new ResizeObserver(()=>{const w=obs.clientWidth;if(w===lastW)return;lastW=w;clearTimeout(rt);rt=setTimeout(()=>current.draw(),100);}).observe(obs);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>requestAnimationFrame(()=>current.draw()));
 
 
@@ -724,15 +743,27 @@ document.getElementById('zoomClose').addEventListener('click',closeZoom);
 zoomEl.addEventListener('click',e=>{if(e.target===zoomEl)closeZoom();});
 let zr;addEventListener('resize',()=>{if(!current.zoom)return;clearTimeout(zr);zr=setTimeout(()=>current.zoom&&current.zoom.draw(),120);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!zoomEl.hidden)closeZoom();else setOpen(false);}});
-side.addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;if(a.hash==='#upd'){const d=document.getElementById('upd');if(d)d.open=true;}setOpen(false);});
-let spy=null;
-function watchSections(){if(spy)spy.disconnect();const links=[...document.querySelectorAll('#sideNav a')];const byId=new Map(links.map(a=>[a.dataset.target,a]));
-  const vis=new Map();
-  spy=new IntersectionObserver(ents=>{ents.forEach(en=>vis.set(en.target.id,en.isIntersecting?en.boundingClientRect.top:null));
-    let best=null,bt=Infinity;for(const [id,top] of vis){if(top!=null&&byId.has(id)&&Math.abs(top)<bt){bt=Math.abs(top);best=id;}}
-    if(best){links.forEach(a=>a.classList.toggle('on',a.dataset.target===best));const on=byId.get(best);if(on&&side.scrollHeight>side.clientHeight){const r=on.getBoundingClientRect(),s=side.getBoundingClientRect();if(r.top<s.top+60||r.bottom>s.bottom-20)on.scrollIntoView({block:'nearest'});}}
-  },{rootMargin:'-10% 0px -60% 0px'});
-  byId.forEach((a,id)=>{const el=document.getElementById(id);if(el)spy.observe(el);});}
+side.addEventListener('click',e=>{if(e.target.closest('a'))setOpen(false);});
+/* back-to-top button for the bottom of long pages */
+function toTop(){const w=document.createElement('div');w.className='totop';const b=document.createElement('button');b.type='button';w.appendChild(b);
+  b.innerHTML='<svg width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5" style="fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/></svg>Back to top';
+  b.addEventListener('click',()=>{window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});const h=document.querySelector('.cpage:not([hidden]) h1')||document.querySelector('.view:not([hidden]) > header h1');if(h){h.tabIndex=-1;h.focus({preventScroll:true});}});return w;}
+document.querySelectorAll('.totop-slot').forEach(sl=>sl.appendChild(toTop()));
+/* pages: one view at a time, chosen by the link's #name (old section links still land on the right page) */
+const VIEWS={overview:'v-overview',stats:'v-stats',data:'v-data'};
+const ALIAS={'':'overview',top:'overview',summary:'overview',medians:'overview',charts:'stats',upd:'data',foot:'data'};
+function route(){const raw=decodeURIComponent(location.hash.slice(1));let key=raw in ALIAS?ALIAS[raw]:raw;
+  const cp=key&&!VIEWS[key]?document.getElementById(key):null;const isClass=!!(cp&&cp.classList.contains('cpage'));if(!VIEWS[key]&&!isClass)key='overview';
+  Object.entries(VIEWS).forEach(([k,id])=>{document.getElementById(id).hidden=k!==key;});document.getElementById('v-class').hidden=!isClass;
+  document.querySelectorAll('.cpage').forEach(p=>{p.hidden=!(isClass&&p===cp);});
+  document.querySelectorAll('#sideNav a').forEach(a=>a.classList.toggle('on',a.dataset.target===key));
+  const on=document.querySelector('#sideNav a.on');if(on&&side.scrollHeight>side.clientHeight)on.scrollIntoView({block:'nearest'});
+  const name=isClass?cp.querySelector('h1').textContent:{overview:'',stats:'Stat by stat',data:'About the data'}[key];document.title=name?`${name} · LEGENDS Codex`:'LEGENDS Codex';
+  tip.hidden=true;closeZoom();const target=raw==='medians'?document.getElementById('medians'):null;
+  if(target)target.scrollIntoView();else window.scrollTo({top:0,left:0,behavior:'instant'});
+  requestAnimationFrame(()=>current.draw());}
+addEventListener('hashchange',route);
+function watchSections(){route();}
 /* ---------- CSV → dataset (same rules as the offline build) ---------- */
 const med=a=>{const v=a.slice().sort((p,q)=>p-q);const n=v.length;if(!n)return null;return n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2;};
 function H(tag,cls,text,p){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;if(p)p.appendChild(e);return e;}
