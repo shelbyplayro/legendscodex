@@ -104,7 +104,6 @@ td.lead{font-weight:600;box-shadow:inset 0 0 0 2px var(--gold)}
 .matrix .cn{color:var(--muted);font-size:11px;margin-left:5px}
 .matrix.compact td,.matrix.compact th{padding:6px 5px;font-size:12px}
 .matrix.compact td.stick{font-size:12.5px;white-space:normal;line-height:1.3}
-@media (max-width:1100px){.matrix.compact td{padding:6px 3px;font-size:11.5px}.matrix.compact thead th{font-size:9px;letter-spacing:.02em;padding-inline:3px}table.compact:not(.matrix) td,table.compact:not(.matrix) th{padding-inline:6px}}
 .matrix.compact thead tr.grp th{font-size:13.5px;padding:6px 4px}
 .matrix.compact thead th{font-size:9.5px;letter-spacing:.06em;vertical-align:bottom}
 .matrix.compact thead tr.grp th.cls-m{vertical-align:middle;text-align:center;box-shadow:none}
@@ -124,6 +123,16 @@ table.compact td,table.compact th{padding:6px 7px}
 .matrix tbody tr:not(.gh) td:not(.h):not(.stick){background:transparent}
 .matrix a{text-decoration:none;border-bottom:1px solid var(--axis)}
 .matrix a:hover{border-bottom-color:var(--gold)}
+/* 16 stat columns: tighten step by step so the table fits without sideways scrolling */
+@media (max-width:1399px){
+  .matrix{border-spacing:2px}.matrix col.c0{width:124px}
+  .matrix.compact td{padding:6px 3px;font-size:11.5px}.matrix.compact td.stick{font-size:12px}
+  .matrix.compact thead th{font-size:9px;letter-spacing:.02em;padding-inline:1px}
+  .matrix.compact thead tr.grp th{font-size:12px;padding-inline:0}
+  table.compact:not(.matrix){font-size:12px}table.compact:not(.matrix) td,table.compact:not(.matrix) th{padding-inline:5px}
+}
+@media (max-width:1299px){table.compact:not(.matrix) td,table.compact:not(.matrix) th{padding-inline:4px}.mtab table.compact td.stick{min-width:118px}}
+@media (max-width:1100px){.matrix.compact td{font-size:11px}.matrix.compact thead th{letter-spacing:0}.matrix.compact thead tr.grp th{font-size:11.5px}table.compact:not(.matrix) td,table.compact:not(.matrix) th{padding-inline:4px}}
 .scale{display:flex;align-items:center;gap:6px 12px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
 .scale span{display:inline-flex;align-items:center;gap:5px}
 .scale i{display:inline-block;width:22px;height:12px;border-radius:4px}
@@ -355,6 +364,7 @@ document.getElementById('copyNote').textContent='';document.getElementById('copy
 current.D=D;
 const M=D.members;
 const GROUPS=[
+  {n:0,t:'ATK',s:[['pa','P.ATK',['P.ATK'],'Attack'],['ma','M.ATK',['M.ATK'],'Attack']]},
   {n:1,t:'raw DEF',s:[['rp','raw P.DEF',['raw','P.DEF'],'Defence'],['rm','raw M.DEF',['raw','M.DEF'],'Defence']]},
   {n:2,t:'Ignore DEF',s:[['ip','Ignore P.DEF',['Ignore','P.DEF'],'Attack'],['im','Ignore M.DEF',['Ignore','M.DEF'],'Attack']]},
   {n:3,t:'Demi-Human',s:[['dd','DMG to Demi-Human',['Demi','DMG'],'Attack'],['dr','Demi-Human Reduction',['Demi','Red.'],'Defence']]},
@@ -363,12 +373,12 @@ const GROUPS=[
   {n:6,t:'DMG Bonus',s:[['pb','P.DMG Bonus',['P.DMG','Bonus'],'Attack'],['mb','M.DMG Bonus',['M.DMG','Bonus'],'Attack']]},
   {n:7,t:'DMG Reduction',s:[['pr','P.DMG Reduction',['P.DMG','Red.'],'Defence'],['mdr','M.DMG Reduction',['M.DMG','Red.'],'Defence']]}
 ];
-const UNIT={rp:'',rm:'',ip:'',im:'',vb:'',vr:'',dd:'%',dr:'%',md:'%',mr:'%',pb:'%',mb:'%',pr:'%',mdr:'%'};
-const SHORT={rp:'raw P.DEF',rm:'raw M.DEF',ip:'Ignore P.DEF',im:'Ignore M.DEF',dd:'Demi-Human',dr:'Demi-Human',md:'Medium',mr:'Medium',vb:'PVP',vr:'PVP',pb:'P.DMG',mb:'M.DMG',pr:'P.DMG',mdr:'M.DMG'};
+const UNIT={pa:'',ma:'',rp:'',rm:'',ip:'',im:'',vb:'',vr:'',dd:'%',dr:'%',md:'%',mr:'%',pb:'%',mb:'%',pr:'%',mdr:'%'};
+const SHORT={pa:'P.ATK',ma:'M.ATK',rp:'raw P.DEF',rm:'raw M.DEF',ip:'Ignore P.DEF',im:'Ignore M.DEF',dd:'Demi-Human',dr:'Demi-Human',md:'Medium',mr:'Medium',vb:'PVP',vr:'PVP',pb:'P.DMG',mb:'M.DMG',pr:'P.DMG',mdr:'M.DMG'};
 const STATS=[];GROUPS.forEach((g,gi)=>g.s.forEach(([k,name,lab,side])=>STATS.push({k,name,lab,side,g,gi,short:SHORT[k]})));
 const CLS=D.classes.map(c=>Object.assign({},c));
 const GT={phys:'Physical attack classes',mag:'Magic attack classes',sup:'Defence / support classes'};
-const SKIP={phys:['im','mb'],mag:['ip','pb'],sup:['im','dd','md','vb','pb','mb']};
+const SKIP={phys:['ma','im','mb'],mag:['pa','ip','pb'],sup:['im','dd','md','vb','pb','mb']};
 const uses=(c,k)=>!SKIP[c.gt].includes(k);
 CLS.forEach(c=>{c.slug=c.name.toLowerCase().replace(/[()]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');c.members=M.filter(m=>m.b===c.k);c.stats=STATS.filter(s=>uses(c,s.k));});
 const NS='http://www.w3.org/2000/svg';
@@ -385,14 +395,16 @@ const list=a=>a.length<=1?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length
 /* baselines: attack stats count attackers only */
 const GTOF={};CLS.forEach(c=>GTOF[c.k]=c.gt);
 const isAtt=m=>GTOF[m.b]==='phys'||GTOF[m.b]==='mag';
-const POOL={ip:m=>GTOF[m.b]==='phys',pb:m=>GTOF[m.b]==='phys',im:m=>GTOF[m.b]==='mag',mb:m=>GTOF[m.b]==='mag',dd:isAtt,md:isAtt,vb:isAtt,ip_sup:m=>GTOF[m.b]==='sup'};
-const REAL=k=>k==='ip_sup'?'ip':k;
-const bk=(k,c)=>k==='ip'&&c&&c.gt==='sup'?'ip_sup':k;
+const isPh=m=>GTOF[m.b]==='phys',isMg=m=>GTOF[m.b]==='mag',isSp=m=>GTOF[m.b]==='sup';
+const POOL={pa:isPh,ip:isPh,pb:isPh,ma:isMg,im:isMg,mb:isMg,dd:isAtt,md:isAtt,vb:isAtt,pa_sup:isSp,ma_sup:isSp,ip_sup:isSp};
+const SUPK=['pa','ma','ip'];
+const REAL=k=>k.replace(/_sup$/,'');
+const bk=(k,c)=>SUPK.includes(k)&&c&&c.gt==='sup'?k+'_sup':k;
 const inPool=(k,m)=>!POOL[k]||POOL[k](m);
-const BASE={ip:'physical attackers',pb:'physical attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',ip_sup:'defence/support characters'};
+const BASE={pa:'physical attackers',ip:'physical attackers',pb:'physical attackers',ma:'magic attackers',im:'magic attackers',mb:'magic attackers',dd:'attackers',md:'attackers',vb:'attackers',pa_sup:'defence/support characters',ma_sup:'defence/support characters',ip_sup:'defence/support characters'};
 const pctLab=k=>BASE[k]?`percentile among ${BASE[k]}`:'guild percentile';
 const medLab=k=>BASE[k]?`Median of ${BASE[k]}`:'Guild median';
-const SORTED={};STATS.map(s=>s.k).concat(['ip_sup']).forEach(k=>{SORTED[k]=M.filter(m=>inPool(k,m)).map(m=>m[REAL(k)]).filter(v=>v!=null).sort((a,b)=>a-b);});
+const SORTED={};STATS.map(s=>s.k).concat(SUPK.map(k=>k+'_sup')).forEach(k=>{SORTED[k]=M.filter(m=>inPool(k,m)).map(m=>m[REAL(k)]).filter(v=>v!=null).sort((a,b)=>a-b);});
 const pct=(k,v)=>{if(v==null)return null;const a=SORTED[k];if(!a.length)return null;let lo=0,eq=0;for(const x of a){if(x<v)lo++;else if(x===v)eq++;}return (lo+eq/2)/a.length*100;};
 const bin=p=>p==null?0:p<20?1:p<40?2:p<60?3:p<80?4:5;
 const GMED={};Object.keys(SORTED).forEach(k=>GMED[k]=med(SORTED[k]));
@@ -412,7 +424,7 @@ document.getElementById('eyebrow').textContent=`LEGENDS · Prontera 1 · Ragnaro
 /* findings, computed from the data */
 (function(){const F=document.getElementById('findings');const add=(b,s)=>{const li=H('li',null,null,F);H('b',null,b,li);H('span',null,s,li);};
   const ph=M.filter(m=>GTOF[m.b]==='phys').length,mg=M.filter(m=>GTOF[m.b]==='mag').length,at=ph+mg;
-  if(at)add('Attacker baselines',`Physical attackers (${ph} characters) have median Ignore P.DEF ${fmt(GMED.ip)} and P.DMG Bonus ${fmt(GMED.pb,'%')}. Magic attackers (${mg}) have Ignore M.DEF ${fmt(GMED.im)} and M.DMG Bonus ${fmt(GMED.mb,'%')}. All ${at} attackers together have median Medium DMG ${fmt(GMED.md,'%')}, Demi-Human DMG ${fmt(GMED.dd,'%')} and PVP Bonus ${fmt(GMED.vb)}.`);
+  if(at)add('Attacker baselines',`Physical attackers (${ph} characters) have median P.ATK ${fmt(GMED.pa)}, Ignore P.DEF ${fmt(GMED.ip)} and P.DMG Bonus ${fmt(GMED.pb,'%')}. Magic attackers (${mg}) have M.ATK ${fmt(GMED.ma)}, Ignore M.DEF ${fmt(GMED.im)} and M.DMG Bonus ${fmt(GMED.mb,'%')}. All ${at} attackers together have median Medium DMG ${fmt(GMED.md,'%')}, Demi-Human DMG ${fmt(GMED.dd,'%')} and PVP Bonus ${fmt(GMED.vb)}.`);
   const uneven=CLS.filter(c=>c.gt!=='sup'&&c.members.length>=3).map(c=>{const a=c.stats.filter(s=>s.side==='Attack'&&c.st[s.k].n).map(s=>({s,p:c.st[s.k].pm})).sort((x,y)=>y.p-x.p);return a.length>1?{c,hi:a[0],lo:a[a.length-1],g:a[0].p-a[a.length-1].p}:null;}).filter(Boolean).sort((x,y)=>y.g-x.g).slice(0,3);
   if(uneven.length)add('No attack class is strong on every attack stat','Against other attackers, '+uneven.map(u=>`${u.c.name} is at the ${ord(u.hi.p)} percentile on ${u.hi.s.name} but the ${ord(u.lo.p)} on ${u.lo.s.name}`).join('; ')+'.');
   const by=new Map();STATS.filter(s=>s.side==='Attack').forEach(s=>LEAD[s.k].forEach(k=>{if(!by.has(k))by.set(k,[]);by.get(k).push(s.name);}));
@@ -546,7 +558,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
   if(mm.age>14)H('div','nm',`Data ${Math.floor(mm.age)} days old`,tip);tip.hidden=false;moveTip(e);}
 ['phys','mag','sup'].forEach(g=>{
   const cl=CLS.filter(c=>c.gt===g);if(!cl.length)return;
-  const gt=H('div','gtitle anchor',null,box);gt.id='g-'+g;H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${g==='sup'?'8 stats':'12 stats'}`,gt);
+  const gt=H('div','gtitle anchor',null,box);gt.id='g-'+g;H('h2',null,GT[g],gt);H('span',null,`${cl.reduce((a,c)=>a+c.members.length,0)} characters · ${cl[0].stats.length} stats`,gt);
   cl.forEach(c=>{
     const sec=H('section','sheet cls',null,box);sec.id=c.slug;
     const ch=H('div','ch',null,sec);H('h3',null,c.name,ch);H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''}`,ch);
@@ -556,7 +568,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
     if(wd.length){if(!above.length)H('b',null,`Class median below baseline on ${below.length===wd.length?'every stat':`${below.length} of ${wd.length} stats`}. `,sum);
       else if(above.length===wd.length)H('b',null,`Class median above baseline on every stat. `,sum);
       else{H('b',null,`Class median above baseline on ${above.length} of ${wd.length} stats: `,sum);tx(list(above)+'. ');}
-      const leads=c.stats.filter(s=>LEADK[bk(s.k,c)].includes(c.k)).map(s=>s.name+(bk(s.k,c)==='ip_sup'?' (among defence/support classes)':'')+(LEADK[bk(s.k,c)].length>1?' (tied)':''));
+      const leads=c.stats.filter(s=>LEADK[bk(s.k,c)].includes(c.k)).map(s=>s.name+(bk(s.k,c).endsWith('_sup')?' (among defence/support classes)':'')+(LEADK[bk(s.k,c)].length>1?' (tied)':''));
       if(leads.length){H('b',null,'Highest class median in the guild: ',sum);tx(list(leads)+'.');}
       if(c.members.length<3)tx(` Based on ${c.members.length} ${c.members.length===1?'member':'members'} only.`);
       const miss=c.stats.filter(s=>!c.st[s.k].n).map(s=>s.name);if(miss.length)tx(` No data for ${list(miss)}.`);}
@@ -635,8 +647,8 @@ current.copyText=copyText;
 
 /* footnote */
 (function(){const f=document.getElementById('foot');
-  H('p',null,'Physical attack classes leave out Ignore M.DEF and M.DMG Bonus; magic attack classes leave out Ignore P.DEF and P.DMG Bonus. Defence/support classes show the 7 defence stats plus Ignore P.DEF. Summoner is split into physical, magic and support builds by its P.ATK and M.ATK.',f);
-  H('p',null,'Baselines: physical attackers for Ignore P.DEF and P.DMG Bonus; magic attackers for Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; defence/support characters for their own Ignore P.DEF; every character for defence stats. Percentile is the share of the baseline with a lower value. Class leaders count only classes with 3 or more members.',f);
+  H('p',null,'Physical attack classes leave out M.ATK, Ignore M.DEF and M.DMG Bonus; magic attack classes leave out P.ATK, Ignore P.DEF and P.DMG Bonus. Defence/support classes show the 7 defence stats plus P.ATK, M.ATK and Ignore P.DEF. Summoner is split into physical, magic and support builds by its P.ATK and M.ATK.',f);
+  H('p',null,'Baselines: physical attackers for P.ATK, Ignore P.DEF and P.DMG Bonus; magic attackers for M.ATK, Ignore M.DEF and M.DMG Bonus; all attackers for DMG to Demi-Human, DMG to Medium and PVP DMG Bonus; defence/support characters for their own P.ATK, M.ATK and Ignore P.DEF; every character for defence stats. Percentile is the share of the baseline with a lower value. Class leaders count only classes with 3 or more members.',f);
   H('p',null,'raw P.DEF = (P.DEF − 150) ÷ (1 + Equipment P.DEF% ÷ 100); raw M.DEF uses M.DEF and Equipment M.DEF% the same way. Data age is the oldest of the General, Advanced and Special sections, counted from the newest update in the file ('+D.ref+').',f);
   if(D.notes&&D.notes.length)H('p',null,'Left out as misread: '+list(D.notes)+'.',f);})();
 }
@@ -715,7 +727,7 @@ function buildData(text,name){
   let ref=null;R.forEach(o=>Object.values(o.t).forEach(v=>{if(v!=null&&(ref==null||v>ref))ref=v;}));if(ref==null)ref=Date.now();
   const r2=v=>v==null?null:Math.round(v*100)/100;
   const members=R.map(o=>{const ts=ATTR_TIMES.map(k=>o.t[k]).filter(v=>v!=null);const oldest=ts.length?Math.min(...ts):null;
-    const m={c:o.c,d:o.d,cls:o.cls,b:o.b,p:o.v.Power==null?null:Math.trunc(o.v.Power),age:oldest==null?0:Math.round((ref-oldest)/8640000)/10,rp:r2(o.rp),rm:r2(o.rm)};
+    const m={c:o.c,d:o.d,cls:o.cls,b:o.b,p:o.v.Power==null?null:Math.trunc(o.v.Power),age:oldest==null?0:Math.round((ref-oldest)/8640000)/10,pa:r2(o.v['P.ATK']),ma:r2(o.v['M.ATK']),rp:r2(o.rp),rm:r2(o.rm)};
     Object.entries(STAT_COLS).forEach(([k,col])=>m[k]=r2(o.v[col]));return m;});
   const present=new Set(members.map(m=>m.b));
   const classes=KNOWN.filter(k=>present.has(k[0])).map(([k,n,a,g])=>({k,name:n,ab:a,gt:g}));
