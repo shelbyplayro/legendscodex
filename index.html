@@ -153,6 +153,9 @@ h4{font-size:19px;font-weight:600}
 .rsw{margin-top:12px}
 .radar{margin-top:4px}.radar svg{display:block;width:100%;height:auto}
 .rlg{justify-content:center;margin-top:6px}
+.prof .sec-head{align-items:center}
+.seg.psw button{white-space:nowrap}
+@media (max-width:560px){.seg.psw button{padding:5px 12px}}
 .atab{display:grid}
 .arow{display:grid;grid-template-columns:minmax(0,1fr) minmax(104px,auto) minmax(104px,auto) 48px;gap:4px 14px;align-items:center;padding:7px 8px;margin:0 -8px;border-bottom:1px solid var(--line);font-size:13px;border-radius:8px}
 .arow:not(.ahead):hover{background:var(--band)}
@@ -480,7 +483,7 @@ html.zoomed{overflow:hidden}
  </div>
 
  <div class="view" id="v-players" hidden>
-  <header class="vh"><div class="eyebrow">LEGENDS Codex · every member</div><h1>Player Attribute</h1><div class="meta">Choose a player to see their ratings, profile and how they compare.</div></header>
+  <header class="vh"><div class="eyebrow">LEGENDS Codex · every member</div><h1>Player Attribute</h1></header>
   <section class="sheet pls"><input class="psearch" id="psearch" type="search" placeholder="Search by character or Discord name" aria-label="Search players"><div id="plist"></div><p class="pnone" id="pnone" hidden>No player matches that name.</p></section>
   <div class="totop-slot"></div>
  </div>
@@ -865,6 +868,34 @@ function drawRadar(cb,axes,series){
     hoverTip(e,t=>{H('div','tv',axes[i].name,t);[As,Bs].forEach(se=>{if(se.rows&&se.rows[i])tipRow(se.col,se.label,se.rows[i]);});});});
   ov.addEventListener('pointerleave',()=>{tip.hidden=true;});
 }
+/* ---------- profile chart: head to head (default) or radar ---------- */
+let profStyle='h2h';
+const profRows=axes=>{const out=[];['Attack','Defence'].forEach(sd=>{const ix=axes.map((a,i)=>a.side===sd?i:-1).filter(i=>i>=0);if(!ix.length)return;out.push({g:sd});ix.forEach(i=>out.push({i}));});return out;};
+function rowHover(svg,W,Hh,spans,axes,series){const [Bs,As]=series;const ov=S('rect',{x:0,y:0,width:W,height:Hh,style:'fill:transparent'},svg);
+  ov.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect(),py=(e.clientY-r.top)*(Hh/r.height);const sp=spans.find(z=>py>=z.y0&&py<z.y1);if(!sp){tip.hidden=true;return;}const i=sp.i;
+    hoverTip(e,t=>{H('div','tv',axes[i].name,t);[As,Bs].forEach(se=>{if(se.rows&&se.rows[i])tipRow(se.col,se.label,se.rows[i]);});});});
+  ov.addEventListener('pointerleave',()=>{tip.hidden=true;});}
+const groupLabel=(svg,x,y,txt,anchor)=>{const t=S('text',{x,y,'text-anchor':anchor||'start','font-size':10,style:'fill:var(--gold-text);letter-spacing:.2em'},svg);t.textContent=txt.toUpperCase();};
+function profSvg(cb,W,Hh){return S('svg',{viewBox:`0 0 ${W} ${Hh}`,role:'img','aria-label':'Percentile on each stat'},cb);}
+function drawH2H(cb,axes,series){
+  cb.textContent='';const W=Math.max(280,cb.clientWidth),narrow=W<460,[Bs,As]=series,L=profRows(axes);
+  const RH=narrow?30:34,GH=28,top=30,cw=narrow?82:110,rt=narrow?24:30,mid=W/2,len=mid-cw/2-rt,bh=narrow?12:14,aL=mid-cw/2,bL=mid+cw/2;
+  const Hh=top+L.reduce((a,r)=>a+(r.g?GH:RH),0)+4,svg=profSvg(cb,W,Hh);const cut=t=>t.length>20?t.slice(0,19)+'…':t;
+  let t=S('text',{x:0,y:14,'font-size':11.5,'font-weight':600,style:'fill:var(--sapphire)'},svg);t.textContent=cut(As.label);
+  t=S('text',{x:W,y:14,'text-anchor':'end','font-size':11.5,'font-weight':600,style:'fill:var(--gold-text)'},svg);t.textContent=cut(Bs.label);
+  [aL-len*0.5,bL+len*0.5].forEach(x=>S('line',{x1:x,x2:x,y1:top-6,y2:Hh-4,style:'stroke:var(--base);stroke-width:1;stroke-dasharray:2 4'},svg));
+  let y=top;const spans=[];
+  L.forEach(r=>{if(r.g){groupLabel(svg,mid,y+GH-9,r.g,'middle');y+=GH;return;}
+    const i=r.i,cy=y+RH/2,a=As.vals[i],b=Bs.vals[i],win=a!=null&&b!=null?(a>b?1:b>a?-1:0):0;
+    S('rect',{x:aL-len,y:cy-bh/2,width:len,height:bh,rx:3,style:'fill:var(--band)'},svg);S('rect',{x:bL,y:cy-bh/2,width:len,height:bh,rx:3,style:'fill:var(--band)'},svg);
+    if(a!=null){const w=Math.max(3,len*a/100);S('rect',{x:aL-w,y:cy-bh/2,width:w,height:bh,rx:3,style:`fill:var(--sapphire);opacity:${win<0?.42:1}`},svg);}
+    if(b!=null){const w=Math.max(3,len*b/100);S('rect',{x:bL,y:cy-bh/2,width:w,height:bh,rx:3,style:`fill:var(--gold);opacity:${win>0?.42:1}`},svg);}
+    const lt=S('text',{x:mid,y:cy+4,'text-anchor':'middle','font-size':narrow?10.5:11.5,style:'fill:var(--ink-2)'},svg);lt.textContent=axes[i].label;
+    let n=S('text',{x:0,y:cy+4.5,'font-size':narrow?12:13,'font-weight':600,style:'fill:var(--sapphire)'},svg);n.textContent=As.rates[i]==null?'–':As.rates[i];
+    n=S('text',{x:W,y:cy+4.5,'text-anchor':'end','font-size':narrow?12:13,'font-weight':600,style:'fill:var(--gold-text)'},svg);n.textContent=Bs.rates[i]==null?'–':Bs.rates[i];
+    spans.push({i,y0:y,y1:y+RH});y+=RH;});
+  rowHover(svg,W,Hh,spans,axes,series);}
+function drawProfile(cb,axes,series){(profStyle==='radar'?drawRadar:drawH2H)(cb,axes,series);}
 /* ---------- players: list, card, compare ---------- */
 const playerCharts=[];
 const badge=(r,p)=>H('span','rb'+(r==null?' rb0':' b'+tierOf(r)),r==null?'–':String(r),p);
@@ -904,16 +935,18 @@ function renderPlayer(A,B){const box=document.getElementById('pcard');box.textCo
   const nameB=B?B.c:`${ca.name} median`,vB=s=>B?B[s.k]:ca.st[s.k].med,cB=B?cb2:ca;
   const grid=H('div','pgrid',null,box);
   const left=H('section','sheet prof',null,grid);const lh=H('div','sec-head',null,left);const lhd=H('div',null,null,lh);H('h3',null,'Profile',lhd);
-  H('p',null,`Percentile on every stat, with the rating under each name. The dashed ring is the baseline median.`,lhd);
+  const psw=H('div','seg psw',null,lh);psw.setAttribute('role','group');psw.setAttribute('aria-label','Chart style');
+  [['h2h','Head to head'],['radar','Radar']].forEach(([v,l])=>{const b=H('button',null,l,psw);b.type='button';b.dataset.v=v;b.setAttribute('aria-pressed',String(v===profStyle));
+    b.addEventListener('click',()=>{profStyle=v;psw.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.v===v)));playerCharts.forEach(({cb,axes,series})=>drawProfile(cb,axes,series));});});
   const rc=H('div','chart radar',null,left);
   const lg=H('div','legend rlg',null,left);let k=H('span',null,null,lg);k.appendChild(dotKey('var(--sapphire)',1));k.appendChild(document.createTextNode(A.c));
   k=H('span',null,null,lg);k.appendChild(B?dotKey('var(--gold)',1):hKey('var(--gold)'));k.appendChild(document.createTextNode(nameB));
   const row=(s,v,c)=>v==null?'–':`${fmt(v,UNIT[s.k])} · rating ${rateOf(s.k,c,v)}`;
-  playerCharts.push({cb:rc,axes:stats.map(s=>({label:s.lab.join(' '),name:s.name})),series:[
-    {vals:stats.map(s=>vB(s)==null?null:pct(bk(s.k,cB),vB(s))),rates:stats.map(s=>vB(s)==null?null:rateOf(s.k,cB,vB(s))),col:'var(--gold)',dash:!B,label:B?B.c:'Class median',rows:stats.map(s=>row(s,vB(s),cB))},
+  playerCharts.push({cb:rc,axes:stats.map(s=>({label:s.lab.join(' '),name:s.name,side:s.side})),series:[
+    {vals:stats.map(s=>vB(s)==null?null:pct(bk(s.k,cB),vB(s))),rates:stats.map(s=>vB(s)==null?null:rateOf(s.k,cB,vB(s))),col:'var(--gold)',dash:!B,label:nameB,rows:stats.map(s=>row(s,vB(s),cB))},
     {vals:stats.map(s=>A[s.k]==null?null:pct(bk(s.k,ca),A[s.k])),rates:stats.map(s=>rateOf(s.k,ca,A[s.k])),col:'var(--sapphire)',label:A.c,rows:stats.map(s=>row(s,A[s.k],ca))}]});
   const right=H('section','sheet attrs',null,grid);const rh=H('div','sec-head',null,right);const rhd=H('div',null,null,rh);H('h3',null,'Attributes',rhd);
-  H('p',null,`Rating 1 to 20 by percentile against the stat's baseline; 20 is the top 5%.`,rhd);
+  H('p',null,`Rating 1 to 20 against each stat's baseline; 20 is the top 5%.`,rhd);
   let wa=0,wb=0;const tbl=H('div','atab',null,right);const head=H('div','arow ahead',null,tbl);H('span',null,'',head);H('span','ha',A.c,head);H('span','hb',nameB,head);H('span',null,'Rank',head);
   ['Attack','Defence'].forEach(side=>{const ss=stats.filter(s=>s.side===side);if(!ss.length)return;H('div','agrp',side,tbl);
     ss.forEach(s=>{const r=H('div','arow',null,tbl);H('span','an',s.name,r);const va=A[s.k],vb=vB(s);const ra=rateOf(s.k,ca,va),rb=vb==null?null:rateOf(s.k,cB,vb);
@@ -921,11 +954,11 @@ function renderPlayer(A,B){const box=document.getElementById('pcard');box.textCo
       const c1=H('span','av'+(ra!=null&&rb!=null&&ra>rb?' win':''),null,r);H('span','vv',fmt(va,UNIT[s.k]),c1);badge(ra,c1);
       const c2=H('span','av bv'+(ra!=null&&rb!=null&&rb>ra?' win':''),null,r);H('span','vv',fmt(vb,UNIT[s.k]),c2);badge(rb,c2);
       const x=ca.st[s.k];H('span','rk',va==null||!x.n?'–':`${1+x.has.filter(z=>z[s.k]>va).length}/${x.n}`,r);});});
-  H('p','asum',B?`${A.c} rates higher on ${wa} ${wa===1?'stat':'stats'}, ${B.c} on ${wb}${stats.length-wa-wb?`, level on ${stats.length-wa-wb}`:''}.`:`Above the ${ca.name} median on ${wa} of ${stats.length} stats. Rank is the place among ${ca.members.length} ${ca.name} members.`,right);
+  H('p','asum',B?`${A.c} rates higher on ${wa} ${wa===1?'stat':'stats'}, ${B.c} on ${wb}${stats.length-wa-wb?`, level on ${stats.length-wa-wb}`:''}.`:`Above the ${ca.name} median on ${wa} of ${stats.length} stats.`,right);
   box.appendChild(toTop());
 }
 const onScreen=el=>el.getClientRects().length>0;
-const drawAll=()=>{multiBoxes.forEach(({cb,s})=>{if(onScreen(cb))drawMulti(cb,s);});memberCharts.forEach(({cb,c,s,opt})=>{if(onScreen(cb))drawMember(cb,c,s,opt);});playerCharts.forEach(({cb,axes,series})=>{if(onScreen(cb))drawRadar(cb,axes,series);});};
+const drawAll=()=>{multiBoxes.forEach(({cb,s})=>{if(onScreen(cb))drawMulti(cb,s);});memberCharts.forEach(({cb,c,s,opt})=>{if(onScreen(cb))drawMember(cb,c,s,opt);});playerCharts.forEach(({cb,axes,series})=>{if(onScreen(cb))drawProfile(cb,axes,series);});};
 current.draw=drawAll;requestAnimationFrame(drawAll);
 
 /* freshness */
