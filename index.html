@@ -156,7 +156,8 @@ h4{font-size:19px;font-weight:600}
 .mates a{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;height:24px;box-sizing:border-box;line-height:1;padding:0 8px}.mates a .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.mates a svg{flex:none}.mates a .mx{opacity:.6;margin-left:1px}.mates a:hover .mx{opacity:1}.mates a.dis{opacity:.45;cursor:default}.mates a.dis:hover{border-color:var(--line);background:transparent;color:var(--ink-2)}
 .mates a.on,.mates a:hover{border-color:var(--gold);color:var(--ink);background:var(--gold-wash)}
 .pnote{margin:0;font-size:13px;color:var(--ink-2)}
-.asum .apn{display:block;margin-top:3px;font-size:11.5px;color:var(--ink-2)}
+.attrs .sec-head p.apn{margin:4px 0 0;font-size:12px;line-height:1.45;color:var(--ink-2)}
+.an .fn.cpn{display:inline!important}
 .mhx{display:inline-flex;align-items:center;justify-content:center;flex:none;width:17px;height:17px;margin-left:1px;border-radius:50%;color:var(--muted);text-decoration:none}.mhx:hover{color:var(--ink);background:var(--band)}.mhx:focus-visible{outline:1.5px solid var(--gold);outline-offset:1px}
 .arow.ahead .hb{display:inline-flex;align-items:center;gap:3px;min-width:0}
 .pgrid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:18px;align-items:stretch}
@@ -198,20 +199,21 @@ h4{font-size:19px;font-weight:600}
 .mrow.mhead{min-height:0;padding:0 8px 10px;border-bottom:1px solid var(--axis);border-radius:0;align-items:end}
 .mrow .mh{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;max-width:100%;font-size:12px;font-weight:500;color:var(--ink-2);line-height:1.3}.mrow .mh svg{flex:none}.mrow .mh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mrow .an{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mrow .an .sn{display:none}
-.mrow .an.mhl{padding-bottom:5px}.mrow .an.mhl .fn{display:inline}.mrow .an.mhl .sn{display:none}
+.mrow .an.mhl{padding-bottom:5px}
 .mhc{display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:0;padding-right:33px}.mhc .mh{margin-right:-33px;max-width:calc(100% + 33px)}.mhc .mh{margin-bottom:5px}
 .mhc .mcp{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .mhc.win .mcp{color:var(--ink);font-weight:600}
 .mhc.win .mb b{opacity:1}
 .mrow .mv{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"v r" "b r";column-gap:7px;row-gap:2px;justify-items:end;align-items:center;min-width:0}.mrow .mv .vv{grid-area:v}.mrow .mv .rb{grid-area:r}
 .mrow .mb{grid-area:b;display:block;width:100%;height:3px;border-radius:999px;background:var(--line);overflow:hidden}.mrow .mb b{display:block;height:100%;border-radius:inherit;opacity:.45}.mrow .mv.win .mb b{opacity:1}
-.atab.mtab{display:flex;flex-direction:column;flex:1 0 auto}.mtab>.mrow:not(.mhead){flex:1 0 auto;max-height:42px;padding-top:1px;padding-bottom:1px}.mtab>.mrow:not(.mhead)>.an{margin-top:-6px}
+.atab.mtab{display:flex;flex-direction:column;flex:1 0 auto}.atab:not(.mtab){display:flex;flex-direction:column;flex:1 0 auto}.atab:not(.mtab)>.arow:not(.ahead){flex:1 0 auto;max-height:40px}
+@media (min-width:1101px) and (min-height:881px){.atab:not(.mtab)>.arow:not(.ahead),.mtab>.mrow:not(.mhead){min-height:28px}}.mtab>.mrow:not(.mhead){flex:1 0 auto;max-height:42px;padding-top:1px;padding-bottom:1px}.mtab>.mrow:not(.mhead)>.an{margin-top:-6px}
 .mrow .vv{font-variant-numeric:tabular-nums;color:var(--ink-2);white-space:nowrap}
 .mrow .mv.win .vv{color:var(--ink);font-weight:600}
 .mrow .rb{min-width:26px;height:20px;padding:0 5px;border-radius:6px;font-size:11.5px}
 .mrow .mv.win .rb{box-shadow:0 0 0 1.5px var(--gold)}
 @container (max-width:560px){.mrow .an .fn{display:none}.mrow .an .sn{display:inline}}
-@container (max-width:440px){.mrow .rb{display:none}.mrow{column-gap:8px}.mrow .mv{grid-template-columns:minmax(0,1fr);grid-template-areas:"v" "b"}.mhc{padding-right:0}.mhc .mh{margin-right:0;max-width:100%}.mrow .an.mhl .fn{display:none}.mrow .an.mhl .sn{display:inline}}
+@container (max-width:440px){.mrow .rb{display:none}.mrow{column-gap:8px}.mrow .mv{grid-template-columns:minmax(0,1fr);grid-template-areas:"v" "b"}.mhc{padding-right:0}.mhc .mh{margin-right:0;max-width:100%}}
 @container (max-width:360px){.mrow{grid-template-columns:minmax(0,1.35fr) repeat(var(--n),minmax(0,1fr));column-gap:6px;font-size:11.5px}.mrow .mh{font-size:11px;gap:3px}.mrow .mh svg:first-child{display:none}.mhx{width:14px;height:14px;margin-left:0}}
 .asum{margin:auto 0 0;padding-top:12px;font-size:12.5px;color:var(--ink-2)}.asum .anote{display:block;margin-top:2px;font-size:11.5px;color:var(--muted)}
 @container (max-width:580px){.arow .an .fn{display:none}.arow .an .sn{display:inline}}
@@ -822,9 +824,9 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
   cl.forEach((c,ci)=>{
     const pg=H('div','cpage',null,box);pg.id=c.slug;pg.hidden=true;
     const hd=H('header','vh',null,pg);H('div','eyebrow',`${GT[g].replace(' classes','')} · ${ci+1} of ${cl.length}`,hd);H('h1',null,c.name,hd);
-    H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''} · ${c.stats.length} stats`,hd);
+    H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Combat Power ${fmt(c.power)}`:''} · ${c.stats.length} stats`,hd);
     const sec=H('section','sheet cls',null,pg);
-    const ch=H('div','ch',null,sec);H('h3',null,c.name,ch);H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Power ${fmt(c.power)}`:''}`,ch);
+    const ch=H('div','ch',null,sec);H('h3',null,c.name,ch);H('div','meta',`${c.members.length} ${c.members.length===1?'member':'members'}${c.power!=null?` · median Combat Power ${fmt(c.power)}`:''}`,ch);
     const wd=c.stats.filter(s=>c.st[s.k].n);
     const above=wd.filter(s=>c.st[s.k].med>GMED[bk(s.k,c)]).map(s=>s.name),below=wd.filter(s=>c.st[s.k].med<GMED[bk(s.k,c)]).map(s=>s.name);
     const sum=H('p','sum',null,sec);const tx=s=>sum.appendChild(document.createTextNode(s));
@@ -848,7 +850,7 @@ function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','t
     }
     const det=H('details','mem',null,sec);const su=H('summary',null,'Every member',det);H('span',null,`${c.members.length} ${c.members.length===1?'member':'members'} · bold = above baseline`,su);
     const tw=H('div','tbl-wrap mtab',null,det);const t=H('table','compact',null,tw);const hr=H('tr',null,null,H('thead',null,null,t));
-    H('th','stick','Character',hr);H('th','r','Power',hr);c.stats.forEach(s=>{const h=H('th','r',null,hr);h.title=s.name;s.lab.forEach(l=>H('span','hl',l,h));});
+    H('th','stick','Character',hr);{const h=H('th','r',null,hr);h.title='Combat Power';H('span','hl','Combat',h);H('span','hl','Power',h);}c.stats.forEach(s=>{const h=H('th','r',null,hr);h.title=s.name;s.lab.forEach(l=>H('span','hl',l,h));});
     const tb=H('tbody',null,null,t);
     c.members.slice().sort((p,q)=>(q.p||0)-(p.p||0)).forEach(mm=>{const tr=H('tr',null,null,tb);const td=H('td','stick',null,tr);const pa=H('a','plink',mm.c,td);pa.href='#'+mm.id;const ac=ageChip(mm);if(ac)td.appendChild(ac);H('span','sub',mm.d,td);
       H('td','h',fmt(mm.p),tr);c.stats.forEach(s=>{const v=mm[s.k];H('td','h'+(v!=null&&GMED[bk(s.k,c)]!=null&&v>GMED[bk(s.k,c)]?' up':''),fmt(v,UNIT[s.k]),tr);});});
@@ -983,11 +985,11 @@ function renderPlayer(A,Bs){Bs=Bs||[];const box=document.getElementById('pcard')
   const ser=(m,c,col,label,dash,get)=>({vals:stats.map(s=>get(s)==null?null:pct(bk(s.k,c),get(s))),rates:stats.map(s=>get(s)==null?null:rateOf(s.k,c,get(s))),col,dash,label,rows:stats.map(s=>row(s,get(s),c))});
   const others=Bs.length?Bs.map((x,n)=>ser(x,CBY[x.b],PCOL[n],x.c,false,s=>x[s.k])):[ser(null,ca,'var(--gold)',nameB,true,s=>ca.st[s.k].med)];
   playerCharts.push({cb:rc,axes:stats.map(s=>({label:s.lab.join(' '),name:s.name})),series:[...others,ser(A,ca,'var(--sapphire)',A.c,false,s=>A[s.k])]});
-  const right=H('section','sheet attrs',null,grid);const rh=H('div','sec-head',null,right);const rhd=H('div',null,null,rh);H('h3',null,'Attributes',rhd);
+  const right=H('section','sheet attrs',null,grid);const rh=H('div','sec-head',null,right);const rhd=H('div',null,null,rh);H('h3',null,'Attributes',rhd);if(pnText)H('p','apn',pnText,rhd);
   if(!multi){
     let wa=0,wb=0,wt=0;const tbl=H('div','atab',null,right);const head=H('div','arow ahead',null,tbl);const hn=H('div','hn',null,head);H('span','ha',A.c,hn);{const hb=H('span','hb',nameB,hn);if(B)rmLink(B,hb);}H('span','hg','Gap',head);H('span','hr','Rank',head);
     {const pv=ca.members.map(z=>z.p).filter(v=>v!=null),va=A.p,vb=B?B.p:med(pv),g=gapOf(va,vb,''),w=g?g.w:0;const r=H('div','arow cprow',null,tbl);
-      const an=H('span','an',null,r);H('span','fn','Combat Power',an);H('span','sn','CP',an);
+      const an=H('span','an',null,r);H('span','fn cpn','Combat Power',an);
       const c1=H('span','av'+(w>0?' win':''),null,r);H('span','vv',fmt(va),c1);H('span','rb rbx',null,c1);
       const sb=H('span','sbar',null,r);if(va!=null&&vb!=null&&va+vb>0){const sh=Math.max(4,Math.min(96,va/(va+vb)*100));H('i',w<0?'lo':null,null,sb).style.width=`calc(${sh}% - 1px)`;H('i',w>0?'lo':null,null,sb).style.width=`calc(${100-sh}% - 1px)`;}
       const c2=H('span','av bv'+(w<0?' win':''),null,r);H('span','rb rbx',null,c2);H('span','vv',fmt(vb),c2);
@@ -1002,20 +1004,17 @@ function renderPlayer(A,Bs){Bs=Bs||[];const box=document.getElementById('pcard')
         const c2=H('span','av bv'+(w<0?' win':''),null,r);badge(rb,c2);H('span','vv',fmt(vb,u),c2);
         H('span','ag '+(w>0?'a':w<0?'b':'l'),g?(w>0?`‹ ${g.t}`:w<0?`${g.t} ›`:'Level'):'',r);
         const x=ca.st[s.k];H('span','rk',va==null||!x.n?'–':`${1+x.has.filter(z=>z[s.k]>va).length}/${x.n}`,r);});});
-    H('p','asum',B?`${A.c} is higher on ${wa} ${wa===1?'stat':'stats'}, ${B.c} on ${wb}${wt?`, level on ${wt}`:''}.`:`Above the ${ca.name} median on ${wa} of ${stats.length} stats.`,right).appendChild(H('span','anote',"Ratings run 1 to 20 against each stat's baseline; 20 is the top 5%."));
   }else{
     const cols=[{m:A,c:ca,col:'var(--sapphire)'},...Bs.map((x,n)=>({m:x,c:CBY[x.b],col:PCOL[n]}))];const leads=cols.map(()=>0);
     const tbl=H('div','atab mtab',null,right);tbl.style.setProperty('--n',cols.length);const head=H('div','mrow mhead',null,tbl);
-    {const hl=H('span','an mhl',null,head);H('span','fn','Combat Power',hl);H('span','sn','CP',hl);const pv=cols.map(o=>o.m.p),top=Math.max(...pv.filter(v=>v!=null)),tie=pv.every(v=>v===top);
+    {const hl=H('span','an mhl',null,head);H('span','fn cpn','Combat Power',hl);const pv=cols.map(o=>o.m.p),top=Math.max(...pv.filter(v=>v!=null)),tie=pv.every(v=>v===top);
       cols.forEach((o,n)=>{const win=o.m.p!=null&&o.m.p===top&&!tie;const h=H('div','mhc'+(win?' win':''),null,head);h.title=o.m.c;const nm=H('span','mh',null,h);nm.appendChild(dotKey(o.col,1));H('span',null,o.m.c,nm);if(n)rmLink(o.m,nm);
         H('span','mcp',fmt(o.m.p),h);mbar(h,o.m.p,top,o.col);});}
     ['Attack','Defence'].forEach(side=>{const ss=stats.filter(s=>s.side===side);if(!ss.length)return;H('div','agrp',side,tbl);
       ss.forEach(s=>{const r=H('div','mrow',null,tbl);const u=UNIT[s.k];const an=H('span','an',null,r);an.title=s.name;H('span','fn',s.name,an);H('span','sn',s.lab.join(' '),an);
         const rv=cols.map(o=>o.m[s.k]==null?null:(u==='%'?Math.round(o.m[s.k]*10):Math.round(o.m[s.k])));const top=Math.max(...rv.filter(v=>v!=null));const tie=rv.filter(v=>v===top).length===rv.length;
         const vmax=Math.max(...cols.map(o=>o.m[s.k]).filter(v=>v!=null));cols.forEach((o,n)=>{const win=rv[n]!=null&&rv[n]===top&&!tie;if(win)leads[n]++;const c=H('span','mv'+(win?' win':''),null,r);mbar(c,o.m[s.k],vmax,o.col);H('span','vv',fmt(o.m[s.k],u),c);badge(o.m[s.k]==null?null:rateOf(s.k,o.c,o.m[s.k]),c);});});});
-    H('p','asum',`Highest value on each stat: ${cols.map((o,n)=>`${o.m.c} ${leads[n]}`).join(' · ')}.`,right).appendChild(H('span','anote',"Ratings run 1 to 20 against each stat's baseline; 20 is the top 5%."));
   }
-  if(pnText){const as=right.querySelector('.asum');as.insertBefore(H('span','apn',pnText),as.querySelector('.anote'));}
   box.appendChild(toTop());
 }
 const onScreen=el=>el.getClientRects().length>0;
