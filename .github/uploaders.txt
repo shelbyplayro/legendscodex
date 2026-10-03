@@ -1,0 +1,3 @@
+# GitHub usernames allowed to upload new data, one per line.
+shelbyplayro
+CT-Git-TEST
