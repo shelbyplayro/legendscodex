@@ -287,7 +287,9 @@ table.compact td,table.compact th{padding:6px 7px}
 .chart text,.strip text{font-family:var(--f-body)}
 .multi{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,500px),1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:18px}
 .mc{background:var(--surface);padding:20px 22px 14px;min-width:0;display:grid;gap:6px}
-.mc .mt{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.mc .mt{display:flex;gap:12px;align-items:flex-start}
+.mc .mtl{flex:1;min-width:0;display:grid;gap:3px;padding-top:3px}
+.mc .mtl span{min-height:1.3em}
 .mc .mt h4 small{font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-left:8px}
 .mc .mt span{font-size:12px;color:var(--muted)}
 .codes{font-size:12px;color:var(--muted);margin:14px 0 0}
@@ -424,7 +426,7 @@ details.sheet summary span{font-family:var(--f-body);font-weight:400;font-size:1
 @media (prefers-reduced-motion:reduce){.side{transition:none}}
 .xbtn{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;flex:none;transition:background .15s,color .15s,border-color .15s}
 .xbtn:hover{background:var(--gold-wash);border-color:var(--gold);color:var(--ink)}
-.mc .mt{align-items:center}
+.mc .mt .xbtn{margin-top:0}
 .card .ct{align-items:center}
 .card .ctr{display:inline-flex;align-items:center;gap:10px}
 .zoom{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 20px) 20px calc(env(safe-area-inset-bottom,0px) + 20px);background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(5px)}
@@ -715,8 +717,8 @@ const tickFmt=(v,u,step)=>u==='±'?(v<0?'−':'')+Math.abs(Math.round(v)).toLoca
   document.getElementById('multiDesc').textContent=`Point at a class to see who holds the highest value.`;
   document.getElementById('codes').textContent='Class codes: '+CLS.map(c=>`${c.ab} ${c.name}`).join(' · ');})();
 const multiBoxes=[];
-(function(){const box=document.getElementById('multi');STATS.forEach(s=>{const d=H('div','mc',null,box);const mt=H('div','mt',null,d);const h=H('h4',null,s.name,mt);H('small',null,s.side,h);
-  const lead=list(LEAD[s.k].map(cname));H('span',null,lead?`Highest median: ${lead}`:'',mt);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
+(function(){const box=document.getElementById('multi');STATS.forEach(s=>{const d=H('div','mc',null,box);const mt=H('div','mt',null,d);const mtl=H('div','mtl',null,mt);const h=H('h4',null,s.name,mtl);H('small',null,s.side,h);
+  const lead=list(LEAD[s.k].map(cname));H('span',null,lead?`Highest median: ${lead}`:'',mtl);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
 function drawMulti(cb,s,opt){
   cb.textContent='';const C=CLS.filter(c=>uses(c,s.k)&&c.st[s.k].n);if(!C.length)return;
   const W=Math.max(280,cb.clientWidth),narrow=W<460||(W-56)/C.length<30;const u=UNIT[s.k];
