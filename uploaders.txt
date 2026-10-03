@@ -1,4 +1,0 @@
-# GitHub usernames allowed to upload new data, one per line.
-# Lines starting with # are ignored. Remove a line to take someone off the list.
-shelbyplayro
-CT-Git-TEST
