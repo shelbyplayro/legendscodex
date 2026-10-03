@@ -155,7 +155,7 @@ h4{font-size:19px;font-weight:600}
 .mates a{font-size:12px;text-decoration:none;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:3px 11px;transition:border-color .2s,background .2s}
 .mates a{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;height:24px;box-sizing:border-box;line-height:1;padding:0 8px}.mates a .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.mates a svg{flex:none}.mates a .mx{opacity:.6;margin-left:1px}.mates a:hover .mx{opacity:1}.mates a.dis{opacity:.45;cursor:default}.mates a.dis:hover{border-color:var(--line);background:transparent;color:var(--ink-2)}
 .mates a.on,.mates a:hover{border-color:var(--gold);color:var(--ink);background:var(--gold-wash)}
-.pnote{margin:0;font-size:13px;color:var(--ink-2)}
+.pnote{margin:0;font-size:12.5px;line-height:1.5;color:var(--muted);max-width:90ch}
 .attrs .sec-head p.apn{margin:4px 0 0;font-size:12px;line-height:1.45;color:var(--ink-2)}
 .an .fn.cpn{display:inline!important}
 .mhx{display:inline-flex;align-items:center;justify-content:center;flex:none;width:17px;height:17px;margin-left:1px;border-radius:50%;color:var(--muted);text-decoration:none}.mhx:hover{color:var(--ink);background:var(--band)}.mhx:focus-visible{outline:1.5px solid var(--gold);outline-offset:1px}
@@ -199,8 +199,8 @@ h4{font-size:19px;font-weight:600}
 .mrow.mhead{min-height:0;padding:0 8px 10px;border-bottom:1px solid var(--axis);border-radius:0;align-items:end}
 .mrow .mh{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;max-width:100%;font-size:12px;font-weight:500;color:var(--ink-2);line-height:1.3}.mrow .mh svg{flex:none}.mrow .mh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mrow .an{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mrow .an .sn{display:none}
-.mrow .an.mhl{padding-bottom:5px}
-.mhc{display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:0;padding-right:33px}.mhc .mh{margin-right:-33px;max-width:calc(100% + 33px)}.mhc .mh{margin-bottom:5px}
+.mrow .an.mhl{padding-bottom:5px;white-space:normal;line-height:1.25}
+.mhc{display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:0;padding-right:33px}.mhc .mh{align-self:stretch;justify-content:center;margin-right:-33px;max-width:none}.mhc .mh{margin-bottom:5px}
 .mhc .mcp{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .mhc.win .mcp{color:var(--ink);font-weight:600}
 .mhc.win .mb b{opacity:1}
@@ -213,7 +213,7 @@ h4{font-size:19px;font-weight:600}
 .mrow .rb{min-width:26px;height:20px;padding:0 5px;border-radius:6px;font-size:11.5px}
 .mrow .mv.win .rb{box-shadow:0 0 0 1.5px var(--gold)}
 @container (max-width:560px){.mrow .an .fn{display:none}.mrow .an .sn{display:inline}}
-@container (max-width:440px){.mrow .rb{display:none}.mrow{column-gap:8px}.mrow .mv{grid-template-columns:minmax(0,1fr);grid-template-areas:"v" "b"}.mhc{padding-right:0}.mhc .mh{margin-right:0;max-width:100%}}
+@container (max-width:440px){.mrow .rb{display:none}.mrow{column-gap:8px}.mrow .mv{grid-template-columns:minmax(0,1fr);grid-template-areas:"v" "b"}.mhc{padding-right:0}.mhc .mh{margin-right:0}}
 @container (max-width:360px){.mrow{grid-template-columns:minmax(0,1.35fr) repeat(var(--n),minmax(0,1fr));column-gap:6px;font-size:11.5px}.mrow .mh{font-size:11px;gap:3px}.mrow .mh svg:first-child{display:none}.mhx{width:14px;height:14px;margin-left:0}}
 .asum{margin:auto 0 0;padding-top:12px;font-size:12.5px;color:var(--ink-2)}.asum .anote{display:block;margin-top:2px;font-size:11.5px;color:var(--muted)}
 @container (max-width:580px){.arow .an .fn{display:none}.arow .an .sn{display:inline}}
@@ -989,7 +989,7 @@ function renderPlayer(A,Bs){Bs=Bs||[];const box=document.getElementById('pcard')
   const ser=(m,c,col,label,dash,get)=>({vals:stats.map(s=>get(s)==null?null:scoreOf(bk(s.k,c),get(s))),rates:stats.map(s=>get(s)==null?null:rateOf(s.k,c,get(s))),col,dash,label,rows:stats.map(s=>row(s,get(s),c))});
   const others=Bs.length?Bs.map((x,n)=>ser(x,CBY[x.b],PCOL[n],x.c,false,s=>x[s.k])):[ser(null,ca,'var(--gold)',nameB,true,s=>ca.st[s.k].med)];
   playerCharts.push({cb:rc,axes:stats.map(s=>({label:s.lab.join(' '),name:s.name})),series:[...others,ser(A,ca,'var(--sapphire)',A.c,false,s=>A[s.k])]});
-  const right=H('section','sheet attrs',null,grid);const rh=H('div','sec-head',null,right);const rhd=H('div',null,null,rh);H('h3',null,'Attributes',rhd);if(pnText)H('p','apn',pnText,rhd);
+  const right=H('section','sheet attrs',null,grid);const rh=H('div','sec-head',null,right);const rhd=H('div',null,null,rh);H('h3',null,'Attributes',rhd);
   if(!multi){
     let wa=0,wb=0,wt=0;const tbl=H('div','atab',null,right);const head=H('div','arow ahead',null,tbl);const hn=H('div','hn',null,head);H('span','ha',A.c,hn);{const hb=H('span','hb',nameB,hn);if(B)rmLink(B,hb);}H('span','hg','Gap',head);H('span','hr','Rank',head);
     {const pv=ca.members.map(z=>z.p).filter(v=>v!=null),va=A.p,vb=B?B.p:med(pv),g=gapOf(va,vb,''),w=g?g.w:0;const r=H('div','arow cprow',null,tbl);
@@ -1019,6 +1019,7 @@ function renderPlayer(A,Bs){Bs=Bs||[];const box=document.getElementById('pcard')
         const rv=cols.map(o=>o.m[s.k]==null?null:(u==='%'?Math.round(o.m[s.k]*10):Math.round(o.m[s.k])));const top=Math.max(...rv.filter(v=>v!=null));const tie=rv.filter(v=>v===top).length===rv.length;
         const vmax=Math.max(...cols.map(o=>o.m[s.k]).filter(v=>v!=null));cols.forEach((o,n)=>{const win=rv[n]!=null&&rv[n]===top&&!tie;if(win)leads[n]++;const c=H('span','mv'+(win?' win':''),null,r);mbar(c,o.m[s.k],vmax,o.col);H('span','vv',fmt(o.m[s.k],u),c);badge(o.m[s.k]==null?null:rateOf(s.k,o.c,o.m[s.k]),c);});});});
   }
+  if(pnText)H('p','pnote',pnText,box);
   box.appendChild(toTop());
 }
 const onScreen=el=>el.getClientRects().length>0;
