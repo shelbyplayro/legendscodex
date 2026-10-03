@@ -1,0 +1,17 @@
+name: Upload new data
+description: Send a new player-stats export to update LEGENDS Codex.
+title: "[data] New upload"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Drag the CSV file you exported from the bot into the box below, then press **Create**.
+        A bot checks the file, updates the site and replies here within a few minutes.
+  - type: textarea
+    id: file
+    attributes:
+      label: CSV file
+      description: Drop the .csv file here, for example player-stats-2026-10-03.csv.
+      placeholder: Drop the file here
+    validations:
+      required: true
