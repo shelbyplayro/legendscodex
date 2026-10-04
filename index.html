@@ -324,7 +324,7 @@ table.compact td,table.compact th{padding:6px 7px}
 .mc{background:var(--surface);padding:20px 22px 14px;min-width:0;display:grid;gap:6px}
 .mc .mt{display:flex;gap:12px;align-items:flex-start}
 .mc .mtl{flex:1;min-width:0;display:grid;gap:3px;padding-top:3px}
-.mc .mtl span{min-height:1.3em}
+.mc .mtl span{min-height:1.3em}.mc .mtl .mref{display:flex;align-items:center;gap:7px}.mc .mtl .mref svg{flex:none}
 .mc .mt h4 small{font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-left:8px}
 .mc .mt span{font-size:12px;color:var(--muted)}
 .codes{font-size:12px;color:var(--muted);margin:14px 0 0}
@@ -632,6 +632,10 @@ const SORTED={};STATS.map(s=>s.k).concat(SUPK.map(k=>k+'_sup')).forEach(k=>{SORT
 const pct=(k,v)=>{if(v==null)return null;const a=SORTED[k];if(!a.length)return null;let lo=0,eq=0;for(const x of a){if(x<v)lo++;else if(x===v)eq++;}return (lo+eq/2)/a.length*100;};
 const bin=p=>p==null?0:p<20?1:p<40?2:p<60?3:p<80?4:5;
 const GMED={};Object.keys(SORTED).forEach(k=>GMED[k]=med(SORTED[k]));
+/* each attack stat is met by a defence stat and the other way round: attack charts show the defenders' median, defence charts the attackers' */
+const OPP={dd:'dr',dr:'dd',md:'mr',mr:'md',vb:'vr',vr:'vb',pb:'pr',pr:'pb',mb:'mdr',mdr:'mb'};  // Ignore DEF vs Raw DEF has its own 'DEF left after Ignore' view
+const SBYK={};STATS.forEach(s=>SBYK[s.k]=s);
+const oppOf=k=>{const o=OPP[k];if(!o||GMED[o]==null)return null;const t=SBYK[o];return {k:o,v:GMED[o],name:t.name,lab:t.lab.join(' '),where:medLab(o).replace(/^Median of /,'median of ').replace(/^Guild median/,'guild median')};};
 const GAPS=[{k:'gp',src:'rp',ref:'ip',name:'DEF left after Ignore · vs physical',tab:'vs physical',side:'Defence',def:'Raw P.DEF',ign:'Ignore P.DEF',pool:'physical attackers',zero:true},
             {k:'gm',src:'rm',ref:'im',name:'DEF left after Ignore · vs magic',tab:'vs magic',side:'Defence',def:'Raw M.DEF',ign:'Ignore M.DEF',pool:'magic attackers',zero:true}];
 GAPS.forEach(g=>{M.forEach(m=>{m[g.k]=m[g.src]!=null&&GMED[g.ref]!=null?m[g.src]-GMED[g.ref]:null;});UNIT[g.k]='±';
@@ -681,6 +685,7 @@ const tip=document.getElementById('tip');
 function moveTip(ev){const pad=16,w=tip.offsetWidth,h=tip.offsetHeight;let x=ev.clientX+pad,y=ev.clientY+pad;if(x+w>innerWidth-8)x=ev.clientX-w-pad;if(y+h>innerHeight-8)y=ev.clientY-h-pad;tip.style.left=Math.max(8,x)+'px';tip.style.top=Math.max(8,y)+'px';}
 function lineKey(col){const s=S('svg',{width:28,height:12,viewBox:'0 0 28 12','aria-hidden':'true'});S('path',{d:'M1 8 C8 8, 9 3, 14 3 S 21 8, 27 5',style:`fill:none;stroke:${col};stroke-width:2;stroke-linecap:round`},s);S('circle',{cx:14,cy:3.2,r:2.8,style:`fill:${col};stroke:var(--surface);stroke-width:1.5`},s);return s;}
 function tickKey(col,w){const s=S('svg',{width:10,height:14,viewBox:'0 0 10 14','aria-hidden':'true'});S('line',{x1:5,x2:5,y1:1,y2:13,style:`stroke:${col};stroke-width:${w};stroke-linecap:round`},s);return s;}
+function dashKey(col){const s=S('svg',{width:24,height:10,viewBox:'0 0 24 10','aria-hidden':'true'});S('line',{x1:1,x2:23,y1:5,y2:5,style:`stroke:${col};stroke-width:1.6;stroke-dasharray:4 3`},s);return s;}
 function hKey(col){const s=S('svg',{width:24,height:10,viewBox:'0 0 24 10','aria-hidden':'true'});S('line',{x1:1,x2:23,y1:5,y2:5,style:`stroke:${col};stroke-width:1.2`},s);return s;}
 function dotKey(col,op){const s=S('svg',{width:12,height:12,viewBox:'0 0 12 12','aria-hidden':'true'});S('circle',{cx:6,cy:6,r:3.4,style:`fill:${col};opacity:${op}`},s);return s;}
 function bandKey(){const s=S('svg',{width:22,height:12,viewBox:'0 0 22 12','aria-hidden':'true'});S('rect',{x:1,y:2,width:20,height:8,rx:1,style:'fill:var(--band-fill);stroke:none'},s);return s;}
@@ -756,17 +761,20 @@ const tickFmt=(v,u,step)=>u==='±'?(v<0?'−':'')+Math.abs(Math.round(v)).toLoca
   a=H('span',null,null,L);a.appendChild(lineKey('var(--gold)'));a.appendChild(document.createTextNode('Class median'));
   a=H('span',null,null,L);a.appendChild(bandKey());a.appendChild(document.createTextNode('Gap between them'));
   a=H('span',null,null,L);a.appendChild(hKey('var(--base)'));a.appendChild(document.createTextNode('Baseline median'));
-  document.getElementById('multiDesc').textContent=`Point at a class to see who holds the highest value.`;
+  a=H('span',null,null,L);a.appendChild(dashKey('var(--rose)'));a.appendChild(document.createTextNode('Median of the opposing stat'));
+  document.getElementById('multiDesc').textContent=`Attack charts show the defenders' median of the stat that blocks them, and defence charts the attackers' median of the stat they block, so you can see which side is ahead. Point at a class to see who holds the highest value.`;
   document.getElementById('codes').textContent='Class codes: '+CLS.map(c=>`${c.ab} ${c.name}`).join(' · ');})();
 const multiBoxes=[];
 (function(){const box=document.getElementById('multi');STATS.forEach(s=>{const d=H('div','mc',null,box);const mt=H('div','mt',null,d);const mtl=H('div','mtl',null,mt);const h=H('h4',null,s.name,mtl);H('small',null,s.side,h);
-  const lead=list(LEAD[s.k].map(cname));H('span',null,lead?`Highest median: ${lead}`:'',mtl);mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,mt.querySelector('span')?mt.querySelector('span').textContent:'',document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
+  const lead=list(LEAD[s.k].map(cname));H('span',null,lead?`Highest median: ${lead}`:'',mtl);
+  {const op=oppOf(s.k),rf=H('span','mref',null,mtl);if(op){rf.appendChild(dashKey('var(--rose)'));rf.appendChild(document.createTextNode(`${op.name}, ${op.where}: ${fmt(op.v,UNIT[op.k])}`));}
+    else{rf.appendChild(hKey('var(--base)'));const ks=[...new Set(CLS.filter(c=>uses(c,s.k)).map(c=>bk(s.k,c)))];rf.appendChild(document.createTextNode(`Baseline median: ${ks.map(k=>`${k.endsWith('_sup')?'supports':BASE[k]||'guild'} ${fmt(GMED[k],UNIT[s.k])}`).join(' · ')}`));}}mt.appendChild(xbtn(`Expand ${s.name} chart`,b=>openZoom(b,`${s.side} stat · every class`,s.name,[...mt.querySelectorAll('.mtl span')].map(x=>x.textContent).filter(Boolean).join(' · '),document.getElementById('legendMulti'),(z,o)=>drawMulti(z,s,o))));const cb=H('div','chart',null,d);multiBoxes.push({cb,s});});})();
 function drawMulti(cb,s,opt){
   cb.textContent='';const C=CLS.filter(c=>uses(c,s.k)&&c.st[s.k].n);if(!C.length)return;
   const W=Math.max(280,cb.clientWidth),narrow=W<460||(W-56)/C.length<30;const u=UNIT[s.k];
   const m={l:narrow?40:48,r:8,t:12,b:narrow?40:26};const Hh=opt&&opt.h?opt.h:210;
   const svg=S('svg',{viewBox:`0 0 ${W} ${Hh}`,role:'img','aria-label':`${s.name}: highest and median by class`},cb);
-  const vals=C.flatMap(c=>c.members.map(z=>z[s.k])).filter(v=>v!=null);if(!vals.length)return;
+  const vals=C.flatMap(c=>c.members.map(z=>z[s.k])).filter(v=>v!=null);if(!vals.length)return;const op=oppOf(s.k);if(op)vals.push(op.v);
   const lo=Math.min(...vals),hi=Math.max(...vals);const nt=niceTicks(Math.max(0,lo-(hi-lo)*0.06),hi+(hi-lo)*0.06,4);
   const y0=nt.ticks[0],y1=nt.ticks[nt.ticks.length-1];const pw=W-m.l-m.r,ph=Hh-m.t-m.b,step=pw/C.length;
   const X=i=>m.l+step*(i+0.5),Y=v=>m.t+ph-(v-y0)/(y1-y0)*ph;
@@ -775,7 +783,8 @@ function drawMulti(cb,s,opt){
   C.forEach((c,i)=>{if(i&&c.gt!==C[i-1].gt){const x=m.l+step*i;S('line',{x1:x,x2:x,y1:m.t,y2:m.t+ph,style:'stroke:var(--axis);stroke-width:1;stroke-dasharray:2 3'},svg);}});
   nt.ticks.forEach(v=>{S('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),style:'stroke:var(--line);stroke-width:1'},svg);
     const t=S('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end','font-size':10.5,style:'fill:var(--muted)'},svg);t.textContent=tickFmt(v,u,nt.step);});
-  const bks=[...new Set(C.map(c=>bk(s.k,c)))];
+  const bks=op?[]:[...new Set(C.map(c=>bk(s.k,c)))];
+  if(op)S('line',{x1:m.l,x2:W-m.r,y1:Y(op.v),y2:Y(op.v),style:'stroke:var(--rose);stroke-width:1.5;stroke-dasharray:5 4'},svg);
   bks.forEach(key=>{const ix=C.map((c,i)=>bk(s.k,c)===key?i:-1).filter(i=>i>=0);if(GMED[key]==null||!ix.length)return;
     const x1=bks.length>1?m.l+step*ix[0]:m.l,x2=bks.length>1?m.l+step*(ix[ix.length-1]+1):W-m.r;S('line',{x1,x2,y1:Y(GMED[key]),y2:Y(GMED[key]),style:'stroke:var(--base);stroke-width:1.2'},svg);});
   C.forEach((c,i)=>{if(narrow){const x=X(i),y=m.t+ph+10;const t=S('text',{x,y,'text-anchor':'end','font-size':10,transform:`rotate(-55 ${x} ${y})`,style:'fill:var(--ink-2)'},svg);t.textContent=c.ab;}
@@ -787,7 +796,7 @@ function drawMulti(cb,s,opt){
   ov.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)*(W/r.width);const i=Math.max(0,Math.min(C.length-1,Math.floor((px-m.l)/step)));
     const c=C[i],x=c.st[s.k];cross.setAttribute('x1',X(i));cross.setAttribute('x2',X(i));cross.style.display='';
     tip.textContent='';H('div','tv',c.name,tip);H('div','nm',s.name,tip);
-    {tipRow('var(--sapphire)','Highest',fmt(x.hi,u),list(x.leaders.map(z=>z.c)));tipRow('var(--gold)','Median',fmt(x.med,u));tipRow('var(--base)',medLab(bk(s.k,c)),fmt(GMED[bk(s.k,c)],u));H('div','nm',`${x.n} ${x.n===1?'member':'members'} with data`,tip);}
+    {tipRow('var(--sapphire)','Highest',fmt(x.hi,u),list(x.leaders.map(z=>z.c)));tipRow('var(--gold)','Median',fmt(x.med,u));tipRow('var(--base)',medLab(bk(s.k,c)),fmt(GMED[bk(s.k,c)],u));if(op)tipRow('var(--rose)',`${op.name} (${op.where})`,fmt(op.v,UNIT[op.k]));H('div','nm',`${x.n} ${x.n===1?'member':'members'} with data`,tip);}
     tip.hidden=false;moveTip(e);});
   ov.addEventListener('pointerleave',()=>{cross.style.display='none';tip.hidden=true;});
 }
@@ -817,7 +826,7 @@ function gapCard(c,cards,lg){
 /* Part II */
 const box=document.getElementById('classes');const memberCharts=[];const classLegends=[];
 function paintCardLegend(lg){lg.textContent='';const add=(key,t)=>{const a=H('span',null,null,lg);a.appendChild(key);a.appendChild(document.createTextNode(t));};
-  add(lineKey('var(--sapphire)'),'Members, highest to lowest');add(hKey('var(--gold)'),'Class median');add(hKey('var(--base)'),'Baseline median');add(bandKey2(),'Middle half of the baseline');add(hollowKey(),'Data older than 14 days');}
+  add(lineKey('var(--sapphire)'),'Members, highest to lowest');add(hKey('var(--gold)'),'Class median');add(hKey('var(--base)'),'Baseline median');add(bandKey2(),'Middle half of the baseline');add(dashKey('var(--rose)'),'Median of the opposing stat');add(hollowKey(),'Data older than 14 days');}
 const rankIn=(k,v)=>{let g=0;for(const x of SORTED[k])if(x>v)g++;return g+1;};
 const staleDot=m=>{if(m.age<=14)return null;const d=H('span','sd'+(m.age>30?' old':''),null);d.title=ageTxt(m);return d;};
 function memberTip(e,mm,c,s,i,n){const u=UNIT[s.k];tip.textContent='';H('div','tv',mm.c,tip);H('div','nm',`${mm.d} · ${c.name}`,tip);
@@ -870,7 +879,7 @@ function drawMember(cb,c,s,opt){
   const spacing=(W-60)/Math.max(n,1);const noN=!!(opt&&opt.noNames);const rot=!noN&&rows.some(r=>r.c.length*6.2>spacing-6);
   const m={l:48,r:84,t:14,b:noN?10:rot?Math.min(78,18+Math.max(...rows.map(r=>Math.min(r.c.length,14)))*5.2):26};const Hh=(opt&&opt.h?opt.h:200)+m.b;
   const svg=S('svg',{viewBox:`0 0 ${W} ${Hh}`,role:'img','aria-label':`${s.name}: ${c.name} members from highest to lowest, with class and baseline medians`},cb);
-  const kb=bk(s.k,c);const A=SORTED[kb];const vals=rows.map(r=>r[s.k]).concat(s.zero?[quant(A,0.25),quant(A,0.75),0]:[A[0],A[A.length-1]]);
+  const kb=bk(s.k,c);const A=SORTED[kb];const op=oppOf(s.k);const vals=rows.map(r=>r[s.k]).concat(s.zero?[quant(A,0.25),quant(A,0.75),0]:[A[0],A[A.length-1]]);if(op)vals.push(op.v);
   const lo=Math.min(...vals),hi=Math.max(...vals);const nt=niceTicks(s.zero?(lo>=0?0:lo-(hi-lo)*0.06):Math.max(0,lo-(hi-lo)*0.06),hi+(hi-lo)*0.08,noN||(opt&&opt.mini)?3:4);const thin=!!(opt&&opt.mini&&opt.h<80);
   const y0=nt.ticks[0],y1=nt.ticks[nt.ticks.length-1];const pw=W-m.l-m.r,ph=Hh-m.t-m.b;
   const X=i=>m.l+pw*(n===1?0.5:(0.04+0.92*i/(n-1))),Y=v=>m.t+ph-(v-y0)/(y1-y0)*ph;
@@ -881,11 +890,16 @@ function drawMember(cb,c,s,opt){
   const hl=(v,col,w)=>S('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),style:`stroke:${col};stroke-width:${w}`},svg);
   if(s.zero&&y0<0&&y1>0)S('line',{x1:m.l,x2:W-m.r,y1:Y(0),y2:Y(0),style:'stroke:var(--ink-2);stroke-width:1;stroke-dasharray:2 3'},svg);
   hl(GMED[kb],'var(--base)',1.4);hl(x.med,'var(--gold)',1.8);
-  let gy=Y(GMED[kb])+4,cy=Y(x.med)+4;if(Math.abs(gy-cy)<24){const mid=(gy+cy)/2;if(gy<=cy){gy=mid-12;cy=mid+12;}else{gy=mid+12;cy=mid-12;}}
+  if(op)S('line',{x1:m.l,x2:W-m.r,y1:Y(op.v),y2:Y(op.v),style:'stroke:var(--rose);stroke-width:1.5;stroke-dasharray:5 4'},svg);
   const gl=(y,top,val,col)=>{const g=S('text',{x:W-m.r+8,y,'font-size':10.5,style:'fill:var(--muted)'},svg);g.textContent=top;
     const v2=S('text',{x:W-m.r+8,y:y+11,'font-size':11,'font-weight':600,style:`fill:var(--ink)`},svg);v2.textContent=val;
     S('line',{x1:W-m.r+2,x2:W-m.r+6,y1:y-3,y2:y-3,style:`stroke:${col};stroke-width:2`},svg);};
-  gl(gy-4,'baseline',fmt(GMED[kb],u),'var(--base)');gl(cy-4,'class',fmt(x.med,u),'var(--gold)');
+  // labels in the right margin, kept 24px apart and inside the plot
+  {const L=[{y:Y(GMED[kb])+4,t:'baseline',v:fmt(GMED[kb],u),c:'var(--base)'},{y:Y(x.med)+4,t:'class',v:fmt(x.med,u),c:'var(--gold)'}];
+    if(op)L.push({y:Y(op.v)+4,t:op.lab,v:fmt(op.v,UNIT[op.k]),c:'var(--rose)'});L.sort((a,b)=>a.y-b.y);
+    for(let i=1;i<L.length;i++)if(L[i].y-L[i-1].y<24)L[i].y=L[i-1].y+24;
+    const over=L[L.length-1].y+12-(m.t+ph);if(over>0)L.forEach(l=>l.y-=over);const under=m.t+10-L[0].y;if(under>0)L.forEach(l=>l.y+=under);
+    L.forEach(l=>gl(l.y-4,l.t,l.v,l.c));}
   const pts=rows.map((r,i)=>[X(i),Y(r[s.k])]);
   if(n>1)S('path',{d:curve(pts),style:'fill:none;stroke:var(--sapphire);stroke-width:2;stroke-linecap:round;stroke-linejoin:round'},svg);
   rows.forEach((r,i)=>{const st=r.age>14;S('circle',{cx:pts[i][0],cy:pts[i][1],r:i===0?4.6:3.8,style:st?'fill:var(--surface);stroke:var(--sapphire);stroke-width:2':'fill:var(--sapphire);stroke:var(--surface);stroke-width:2'},svg);});
