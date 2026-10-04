@@ -269,7 +269,7 @@ tr.gh td.stick{background:var(--band)}
 tr.medrow td{font-weight:600;border-top:1px solid var(--axis)}
 .b1{background:var(--h1);color:var(--t1)} .b2{background:var(--h2);color:var(--t2)} .b3{background:var(--h3);color:var(--t3)} .b4{background:var(--h4);color:var(--t4)} .b5{background:var(--h5);color:var(--t5)}
 td.na{color:var(--muted);background:repeating-linear-gradient(135deg,transparent 0 6px,var(--band) 6px 7px)}
-td.lead{font-weight:600;box-shadow:inset 0 0 0 2px var(--gold)}
+td.lead{font-weight:600;box-shadow:inset 0 0 0 2px var(--gold)}td.lead.low{box-shadow:inset 0 0 0 2px var(--rose)}
 .matrix{border-spacing:3px;table-layout:fixed;width:100%;min-width:900px}
 .matrix col.c0{width:142px}
 .sheet:has(#matrixWrap){padding-inline:22px}
@@ -312,7 +312,7 @@ table.compact td,table.compact th{padding:6px 7px}
 .seg button[aria-pressed="true"]{background:var(--gold-wash);color:var(--ink);box-shadow:inset 0 0 0 1px var(--gold)}
 .scale span{display:inline-flex;align-items:center;gap:5px}
 .scale i{display:inline-block;width:22px;height:12px;border-radius:4px}
-.scale .ld{box-shadow:inset 0 0 0 2px var(--gold);background:var(--h2)}
+.scale .ld{box-shadow:inset 0 0 0 2px var(--gold);background:var(--h2)}.scale .ld.low{box-shadow:inset 0 0 0 2px var(--rose)}
 .scale .nai{background:repeating-linear-gradient(135deg,transparent 0 4px,var(--axis) 4px 5px);border:1px solid var(--line)}
 
 .legend{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--ink-2);align-items:center}
@@ -725,7 +725,7 @@ const tickFmt=(v,u,step)=>u==='±'?(v<0?'−':'')+Math.abs(Math.round(v)).toLoca
 
 /* scale */
 (function(){const s=document.getElementById('scale');H('span',null,'Rating',s);['1–4','5–8','9–12','13–16','17–20'].forEach((t,i)=>{const w=H('span',null,null,s);H('i','b'+(i+1),null,w);H('span',null,t,w);});
-  let w=H('span',null,null,s);H('i','ld',null,w);H('span',null,'Class leader',w);w=H('span',null,null,s);H('i','nai',null,w);H('span',null,'Not used',w);})();
+  let w=H('span',null,null,s);H('i','ld',null,w).id='ldKey';H('span',null,'Class leader',w).id='ldLab';w=H('span',null,null,s);H('i','nai',null,w);H('span',null,'Not used',w);})();
 
 /* matrix: one compact table, stat pairs side by side */
 (function(){const wrap=document.getElementById('matrixWrap');const cells=[];const tw=H('div','tbl-wrap mx',null,wrap);const t=H('table','matrix compact',null,tw);
@@ -741,13 +741,14 @@ const tickFmt=(v,u,step)=>u==='±'?(v<0?'−':'')+Math.abs(Math.round(v)).toLoca
   const MODES={med:{b:'Median',h:'Class medians',d:'Each cell is the class median'},hi:{b:'Highest',h:'Highest in each class',d:'Each cell is the highest value among the class members'},lo:{b:'Lowest',h:'Lowest in each class',d:'Each cell is the lowest value among the class members'}};
   const leadCache={};const leadFor=(k,key,mode)=>{const id=k+'|'+key+'|'+mode;if(id in leadCache)return leadCache[id];
     const el=CLS.filter(c=>uses(c,k)&&bk(k,c)===key&&c.st[k].n);let out=[];
-    if(el.length){const top=Math.max(...el.map(c=>c.st[k][mode]));out=el.filter(c=>Math.abs(c.st[k][mode]-top)<1e-9).map(c=>c.k);}return leadCache[id]=out;};
+    if(el.length){const vs=el.map(c=>c.st[k][mode]),top=mode==='lo'?Math.min(...vs):Math.max(...vs);out=el.filter(c=>Math.abs(c.st[k][mode]-top)<1e-9).map(c=>c.k);}return leadCache[id]=out;};
   function paint(mode){const M2=MODES[mode];document.getElementById('h-mx').textContent=M2.h;
     document.getElementById('mxDesc').textContent=`${M2.d}, shaded by its rating against the stat's baseline. Click a class to open its page.`;
     seg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.m===mode)));
+    document.getElementById('ldKey').classList.toggle('low',mode==='lo');document.getElementById('ldLab').textContent=mode==='lo'?'Lowest of all classes':'Class leader';
     cells.forEach(({td,c,s})=>{const x=c.st[s.k],u=UNIT[s.k],v=x.n?x[mode]:null;td.textContent=x.n?fmt(v,u):'–';
       if(!uses(c,s.k)){td.className='h na';td.title=`${c.name} doesn't use ${s.name}`;return;}
-      const key=bk(s.k,c),rt=x.n?rateOf(s.k,c,v):null;td.className='h'+(x.n?' b'+tierOf(rt):'')+(leadFor(s.k,key,mode).includes(c.k)?' lead':'');
+      const key=bk(s.k,c),rt=x.n?rateOf(s.k,c,v):null;td.className='h'+(x.n?' b'+tierOf(rt):'')+(leadFor(s.k,key,mode).includes(c.k)?(mode==='lo'?' lead low':' lead'):'');
       if(!x.n){td.title='No data';return;}
       const who=mode==='hi'?` (${list(x.leaders.map(z=>z.c))})`:mode==='lo'?` (${list(x.lows.map(z=>z.c))})`:'';
       td.title=`${c.name} · ${s.name}: ${M2.b.toLowerCase()} ${fmt(v,u)}${who}, rated ${rt} of 20 ${pctLab(key)}${x.n<c.members.length?` · ${x.n} of ${c.members.length} with data`:''}`;});}
