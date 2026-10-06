@@ -36,7 +36,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.csv
+          git add data.csv history
           git commit -m "Update data.csv (uploaded by @${AUTHOR} in #${NUM})"
           git push
           gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" > /dev/null 2>&1 || true
