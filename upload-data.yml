@@ -1,0 +1,52 @@
+name: Upload guild data
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+
+concurrency:
+  group: data-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    if: startsWith(github.event.issue.title, '[data]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the file
+        id: check
+        env:
+          AUTHOR: ${{ github.event.issue.user.login }}
+          BODY: ${{ github.event.issue.body }}
+        run: python3 .github/scripts/check_upload.py
+
+      - name: Save data.csv and its history copy
+        if: steps.check.outputs.result == 'ok'
+        env:
+          AUTHOR: ${{ github.event.issue.user.login }}
+          NUM: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.csv history
+          git commit -m "Update data.csv (uploaded by @${AUTHOR} in #${NUM})"
+          git push
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" > /dev/null 2>&1 || true
+
+      - name: Reply and close
+        if: always()
+        env:
+          NUM: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test -s reply.md || echo "Something went wrong while checking this upload. Nothing was changed. Ask the site owner to look at the Actions tab." > reply.md
+          gh issue comment "$NUM" --repo "$GITHUB_REPOSITORY" --body-file reply.md
+          gh issue close "$NUM" --repo "$GITHUB_REPOSITORY"
